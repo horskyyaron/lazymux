@@ -1,56 +1,31 @@
-import { createCliRenderer } from "@opentui/core";
-import {
-  createRoot,
-  useKeyboard,
-  useRenderer,
-  useOnResize,
-  useTerminalDimensions,
-} from "@opentui/react";
-import { useEffect, useState } from "react";
+import { createCliRenderer, type TextareaRenderable } from "@opentui/core";
+import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
+import { useEffect, useRef } from "react";
 
 function App() {
-  const { height, width } = useTerminalDimensions();
-  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
-
   const renderer = useRenderer();
-  useKeyboard(
-    (event) => {
-      setPressedKeys((keys) => {
-        const newKeys = new Set(keys);
-        if (event.eventType === "release") {
-          newKeys.delete(event.name);
-        } else {
-          newKeys.add(event.name);
-        }
-        return newKeys;
-      });
-    },
-    { release: true },
-  );
+  const textareaRef = useRef<TextareaRenderable>(null);
 
   useEffect(() => {
     renderer.console.show();
-    console.log("hello");
-  }, []);
+  }, [renderer]);
 
-  useOnResize((width, height) => {
-    console.log(`Terminal resized to ${width}x${height}`);
+  useKeyboard((key) => {
+    if (key.name === "i") {
+      key.preventDefault();
+      textareaRef.current?.focus();
+      return;
+    }
+    if (key.name === "return") {
+      if (!textareaRef.current?.focused) return;
+      console.log(textareaRef.current?.plainText);
+      textareaRef.current?.blur();
+    }
   });
 
   return (
-    <box>
-      <text>
-        terminal dimensions: {width} : {height}
-      </text>
-      <box
-        style={{
-          width: Math.floor(width / 2),
-          height: Math.floor(height / 3),
-          border: true,
-        }}
-      >
-        <text>1/2 width, 1/3 size</text>
-      </box>
+    <box title="Interactive Editor" style={{ border: true, flexGrow: 1 }}>
+      <textarea ref={textareaRef} placeholder="Type here..." focused />
     </box>
   );
 }
