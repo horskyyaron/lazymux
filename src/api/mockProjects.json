@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1",
+    "name": "lazy-project",
+    "path": "~/dev/lazy-project"
+  },
+  {
+    "id": "2",
+    "name": "ytpm",
+    "path": "~/dev/ytpm"
+  },
+  {
+    "id": "3",
+    "name": "compiler-go",
+    "path": "~/dev/compiler-go"
+  }
+]
