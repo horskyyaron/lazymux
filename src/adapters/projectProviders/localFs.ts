@@ -1,14 +1,18 @@
-import type { promises } from "dns";
 import { promises as fs } from "fs";
 import path from "path";
-
-import projectsJson from "../../data/mockProjects.json";
 import type { Project } from "../../data/types";
 
-const projects = projectsJson as Project[];
-const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+const PROJECTS_ROOT = "/Users/yaronhorsky/projects/"; // or from config/env
 
-export async function getDirectories(): Promise<Project[]> {
-  await sleep(150);
-  return projects;
+export async function getProjectsDirectories(): Promise<Project[]> {
+  const entries = await fs.readdir(PROJECTS_ROOT, { withFileTypes: true });
+
+  const dirs = entries.filter((e) => e.isDirectory());
+
+  return dirs.map((d) => ({
+    id: d.name,
+    name: d.name,
+    path: path.join(PROJECTS_ROOT, d.name),
+    source: "local",
+  }));
 }

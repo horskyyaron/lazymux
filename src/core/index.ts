@@ -1,5 +1,5 @@
 import { getTmuxSessions } from "../adapters/multiplexer/tmux";
-import { getDirectories } from "../adapters/projectProviders/localFs";
+import { getProjectsDirectories } from "../adapters/projectProviders/localFs";
 import { getReadme } from "../adapters/readme/localFs";
 import type { Project, Session } from "../data/types";
 
@@ -10,7 +10,7 @@ export const api = {
   },
 
   async getProjects(): Promise<Project[]> {
-    const dirs = await getDirectories();
+    const dirs = await getProjectsDirectories();
     return dirs;
   },
 

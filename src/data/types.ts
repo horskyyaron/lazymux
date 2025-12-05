@@ -2,10 +2,12 @@ export interface Session {
   id: string;
   name: string;
   path: string;
+  isCurrent: boolean;
 }
 
 export interface Project {
   id: string;
   name: string;
   path: string;
+  source: "local" | "remote";
 }
