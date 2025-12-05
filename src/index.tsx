@@ -3,6 +3,7 @@ import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import React, { useEffect, useState } from "react";
 import { api } from "./api";
 import type { Session, Project } from "./api/types";
+import { ProjectSelection } from "./ui/ProjectSelection";
 
 function App() {
   const renderer = useRenderer();
@@ -36,6 +37,11 @@ function App() {
     setReadme(option.value.name);
   };
 
+  const sections = [
+    { sectionTabName: "sessions", data: sessions },
+    { sectionTabName: "projects", data: projects },
+  ];
+
   return (
     <box
       border
@@ -46,62 +52,24 @@ function App() {
       flexDirection="row"
     >
       <box width={"30%"}>
-        <box
-          title="[1]-sessions"
-          style={{
-            border: true,
-            height: "50%",
-            borderColor: selectedTab === "sessions" ? "yellow" : "white",
-          }}
-        >
-          <select
-            focused={selectedTab == "sessions"}
-            showScrollIndicator
-            wrapSelection
-            selectedBackgroundColor={
-              selectedTab === "sessions" ? "orange" : "transparent"
-            }
-            selectedTextColor={selectedTab === "sessions" ? "black" : "white"}
-            showDescription={false}
-            focusedBackgroundColor={"transparent"}
-            onSelect={handleSessionSelected}
-            options={sessions.map((s) => ({
-              name: s.name,
-              description: "description",
-              value: { name: "yaron" },
-            }))}
-            style={{ flexGrow: 1 }}
-          />
-        </box>
-
-        <box
-          title="[2]-projects"
-          style={{
-            border: true,
-            height: "50%",
-            borderColor: selectedTab === "projects" ? "yellow" : "white",
-          }}
-        >
-          <select
-            focused={selectedTab == "projects"}
-            showScrollIndicator
-            wrapSelection
-            showDescription={false}
-            focusedBackgroundColor={"transparent"}
-            selectedBackgroundColor={
-              selectedTab === "projects" ? "orange" : "transparent"
-            }
-            selectedTextColor={selectedTab === "projects" ? "black" : "white"}
-            options={projects.map((s) => ({
-              name: s.path,
-              description: "description",
-              value: s.name,
-            }))}
-            style={{ flexGrow: 1 }}
-          />
-        </box>
+        {sections.map((s, idx) => {
+          return (
+            <ProjectSelection
+              sectionHeader={`[${idx}]-${s.sectionTabName}`}
+              focoused={selectedTab == s.sectionTabName}
+              sectionName={s.sectionTabName}
+              handleSelect={handleSessionSelected}
+              options={s.data.map((s) => {
+                return {
+                  name: s.name,
+                  description: "",
+                  value: { name: s.name },
+                };
+              })}
+            />
+          );
+        })}
       </box>
-
       <box
         border
         width={"70%"}
