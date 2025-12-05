@@ -11,15 +11,17 @@ function App() {
   const [selectedTab, setSelectedTab] = useState<
     "sessions" | "projects" | "readme"
   >("sessions");
-
-  console.log("selectedTab:", selectedTab);
+  const [readme, setReadme] = useState<string>("");
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
       renderer.console.toggle();
-    }
-    if (key.name === "tab") {
+    } else if (key.name === "tab") {
       setSelectedTab(selectedTab === "sessions" ? "projects" : "sessions");
+    } else if (key.name === "1") {
+      setSelectedTab("sessions");
+    } else if (key.name === "2") {
+      setSelectedTab("projects");
     }
   });
 
@@ -31,6 +33,7 @@ function App() {
 
   const handleSessionSelected = (index: number, option: any) => {
     console.log(index, option);
+    setReadme(option.value.name);
   };
 
   return (
@@ -105,7 +108,7 @@ function App() {
         title={"project's readme"}
         titleAlignment="center"
       >
-        <text>select a project to show its README here…</text>
+        <text>{readme}</text>
       </box>
     </box>
   );
