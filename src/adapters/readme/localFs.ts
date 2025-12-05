@@ -6,7 +6,6 @@ import type { Project, Session } from "../../data/types";
 const possibleNames = ["README.md", "readme.md", "Readme.md", "README"];
 
 export async function getReadme(source: Project | Session): Promise<string> {
-  console.log("in  reademe local", source);
   for (const name of possibleNames) {
     const full = path.join(source.path, name);
     try {
