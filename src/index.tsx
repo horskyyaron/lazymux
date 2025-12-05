@@ -55,6 +55,7 @@ function App() {
         {sections.map((s, idx) => {
           return (
             <ProjectSelection
+              key={idx}
               sectionHeader={`[${idx}]-${s.sectionTabName}`}
               focoused={selectedTab == s.sectionTabName}
               sectionName={s.sectionTabName}

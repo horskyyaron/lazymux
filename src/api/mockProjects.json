@@ -1,17 +1,17 @@
 [
   {
     "id": "1",
-    "name": "lazy-project",
-    "path": "~/dev/lazy-project"
+    "name": "advent_of_neovim",
+    "path": "~/projects/advent_of_neovim/"
   },
   {
     "id": "2",
-    "name": "ytpm",
-    "path": "~/dev/ytpm"
+    "name": "congo",
+    "path": "~/projects/congo/"
   },
   {
     "id": "3",
-    "name": "compiler-go",
-    "path": "~/dev/compiler-go"
+    "name": "opencode",
+    "path": "~/projects/opencode/"
   }
 ]
