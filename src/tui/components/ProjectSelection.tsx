@@ -5,6 +5,7 @@ export interface SelectSectionProps {
   sectionName: string;
   options: SelectOption[];
   handleSelect?: (index: number, option: SelectOption | null) => void;
+  handleOnChange?: (index: number, option: SelectOption | null) => void;
   focoused: boolean;
 }
 
@@ -12,6 +13,7 @@ export function ProjectSelection({
   sectionHeader,
   sectionName,
   handleSelect,
+  handleOnChange,
   focoused = false,
   options,
 }: SelectSectionProps) {
@@ -33,6 +35,7 @@ export function ProjectSelection({
         showDescription={false}
         focusedBackgroundColor={"transparent"}
         onSelect={handleSelect}
+        onChange={handleOnChange}
         options={options.map((s) => ({
           name: s.name,
           description: "description",
