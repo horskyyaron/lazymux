@@ -1,9 +1,9 @@
 import { createCliRenderer, KeyEvent } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import React, { useEffect, useState } from "react";
-import type { Session, Project } from "../core/types";
 import { ProjectSelection } from "./components/ProjectSelection";
 import { api } from "../core";
+import type { Project, Session } from "../data/types";
 
 function App() {
   const renderer = useRenderer();
@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
     // “fake calls” – they hit your mock API which reads JSON
     api.listSessions().then(setSessions).catch(console.error);
-    api.listProjects().then(setProjects).catch(console.error);
+    api.getProjects().then(setProjects).catch(console.error);
   }, []);
 
   const handleSessionSelected = (index: number, option: any) => {

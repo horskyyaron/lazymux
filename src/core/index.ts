@@ -1,10 +1,8 @@
-import type { Session, Project } from "./types";
+import { getDirectories } from "../adapters/projectProviders/localFs";
 import sessionsJson from "../data/mockSessions.json";
-import projectsJson from "../data/mockProjects.json";
+import type { Project, Session } from "../data/types";
 
 const sessions = sessionsJson as Session[];
-const projects = projectsJson as Project[];
-
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export const api = {
@@ -13,8 +11,8 @@ export const api = {
     return sessions;
   },
 
-  async listProjects(): Promise<Project[]> {
-    await sleep(150);
-    return projects;
+  async getProjects(): Promise<Project[]> {
+    const dirs = await getDirectories();
+    return dirs;
   },
 };
