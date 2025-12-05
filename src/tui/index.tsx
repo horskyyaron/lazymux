@@ -32,9 +32,13 @@ function App() {
     api.getProjects().then(setProjects).catch(console.error);
   }, []);
 
-  const handleSessionSelected = (index: number, option: any) => {
-    console.log(index, option);
-    setReadme(option.value.name);
+  const handleSessionSelected = async (index: number, option: any) => {
+    console.log("selected");
+  };
+
+  const handleOnChange = async (index: number, option: any) => {
+    const readme = await api.getProjectReadme(option);
+    setReadme(readme);
   };
 
   const sections = [
@@ -60,6 +64,7 @@ function App() {
               focoused={selectedTab == s.sectionTabName}
               sectionName={s.sectionTabName}
               handleSelect={handleSessionSelected}
+              handleOnChange={handleOnChange}
               options={s.data.map((s) => {
                 return {
                   name: s.name,
