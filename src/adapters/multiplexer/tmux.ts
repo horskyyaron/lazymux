@@ -13,19 +13,27 @@ function run(cmd: string): Promise<string> {
 }
 
 export async function getTmuxSessions(): Promise<Session[]> {
-  // tmux format: "session_name:..."
-  const output = await run("tmux list-sessions -F '#{session_name}'");
-  const currentSession = (await run("tmux display-message -p '#S'")).trim();
-
-  const lines = output
+  const names = (await run("tmux list-sessions -F '#{session_name}'"))
     .trim()
     .split("\n")
-    .filter((l) => l.length > 0);
+    .filter(Boolean);
 
-  return lines.map((name) => ({
-    id: name,
-    name,
-    path: "",
-    isCurrent: name === currentSession,
-  }));
+  const current = (await run("tmux display-message -p '#S'")).trim();
+
+  const sessions: Session[] = [];
+
+  for (const name of names) {
+    const path = (
+      await run(`tmux display-message -p -t ${name} '#{pane_current_path}'`)
+    ).trim();
+
+    sessions.push({
+      id: name,
+      name,
+      path,
+      isCurrent: name === current,
+    });
+  }
+
+  return sessions;
 }
