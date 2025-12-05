@@ -1,9 +1,11 @@
 import type { SelectOption } from "@opentui/core";
+import type { Project, Session } from "../../data/types";
 
 export interface SelectSectionProps {
   sectionHeader: string;
   sectionName: string;
-  options: SelectOption[];
+  // options: SelectOption[];
+  options: Project[] | Session[];
   handleSelect?: (index: number, option: SelectOption | null) => void;
   handleOnChange?: (index: number, option: SelectOption | null) => void;
   focoused: boolean;
@@ -39,7 +41,7 @@ export function ProjectSelection({
         options={options.map((s) => ({
           name: s.name,
           description: "description",
-          value: { name: s.name },
+          value: s,
         }))}
         style={{ flexGrow: 1 }}
       />

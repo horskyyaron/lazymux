@@ -37,7 +37,7 @@ function App() {
   };
 
   const handleOnChange = async (index: number, option: any) => {
-    const readme = await api.getProjectReadme(option);
+    const readme = await api.getProjectReadme(option.value);
     setReadme(readme);
   };
 
@@ -65,13 +65,7 @@ function App() {
               sectionName={s.sectionTabName}
               handleSelect={handleSessionSelected}
               handleOnChange={handleOnChange}
-              options={s.data.map((s) => {
-                return {
-                  name: s.name,
-                  description: "",
-                  value: { name: s.name },
-                };
-              })}
+              options={s.data}
             />
           );
         })}

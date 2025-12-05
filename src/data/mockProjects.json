@@ -2,16 +2,16 @@
   {
     "id": "1",
     "name": "advent_of_neovim",
-    "path": "~/projects/advent_of_neovim/"
+    "path": "/Users/yaronhorsky/projects/advent_of_neovim/"
   },
   {
     "id": "2",
     "name": "congo",
-    "path": "~/projects/congo/"
+    "path": "/Users/yaronhorsky/projects/congo/"
   },
   {
     "id": "3",
     "name": "opencode",
-    "path": "~/projects/opencode/"
+    "path": "/Users/yaronhorsky/projects/opencode/"
   }
 ]
