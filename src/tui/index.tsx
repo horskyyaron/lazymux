@@ -28,7 +28,7 @@ function App() {
 
   useEffect(() => {
     // “fake calls” – they hit your mock API which reads JSON
-    api.listSessions().then(setSessions).catch(console.error);
+    api.getSessions().then(setSessions).catch(console.error);
     api.getProjects().then(setProjects).catch(console.error);
   }, []);
 
