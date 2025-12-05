@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun run --watch src/index.tsx"
+    "tui": "bun run --watch ./src/tui/index.tsx"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -18,3 +18,4 @@
     "react": "^19.1.1"
   }
 }
+

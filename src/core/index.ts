@@ -1,6 +1,6 @@
 import type { Session, Project } from "./types";
-import sessionsJson from "./mockSessions.json";
-import projectsJson from "./mockProjects.json";
+import sessionsJson from "../data/mockSessions.json";
+import projectsJson from "../data/mockProjects.json";
 
 const sessions = sessionsJson as Session[];
 const projects = projectsJson as Project[];

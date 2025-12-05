@@ -1,9 +1,9 @@
 import { createCliRenderer, KeyEvent } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import React, { useEffect, useState } from "react";
-import { api } from "./api";
-import type { Session, Project } from "./api/types";
-import { ProjectSelection } from "./ui/ProjectSelection";
+import type { Session, Project } from "../core/types";
+import { ProjectSelection } from "./components/ProjectSelection";
+import { api } from "../core";
 
 function App() {
   const renderer = useRenderer();
