@@ -1,61 +1,67 @@
-import { createCliRenderer, KeyEvent } from "@opentui/core";
+import { createCliRenderer, KeyEvent, type SelectOption } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
-import React, { useEffect, useState } from "react";
-import { ProjectSelection } from "./components/ProjectSelection";
+import { useState } from "react";
+import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
-import type { Project, Session } from "../data/types";
+import {
+  Tabs,
+  type Project,
+  type ListSection,
+  type SelectableItem,
+  type Session,
+} from "../data/types";
+import { getMenuForItem, type Menu } from "../core/menu/menuGenerator";
 
 function App() {
   const renderer = useRenderer();
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedTab, setSelectedTab] = useState<
-    "sessions" | "projects" | "readme"
-  >("sessions");
+  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [candidateSelection, setCandidateSelection] = useState<{
-    type: "session" | "project";
-    value: Session | Project;
-  }>();
+  const [candidateSelection, setCandidateSelection] =
+    useState<SelectableItem | null>(null);
+  const [candidateMenu, setCandidateMenu] = useState<Menu | null>(null);
+  console.log(candidateMenu);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
       renderer.console.toggle();
     } else if (key.name === "tab") {
-      setSelectedTab(selectedTab === "sessions" ? "projects" : "sessions");
+      setSelectedTab(
+        selectedTab === Tabs.SESSIONS ? Tabs.PROJECTS : Tabs.SESSIONS,
+      );
     } else if (key.name === "1") {
-      setSelectedTab("sessions");
+      setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
-      setSelectedTab("projects");
+      setSelectedTab(Tabs.PROJECTS);
     }
   });
 
-  useEffect(() => {
-    api.getSessions().then(setSessions).catch(console.error);
-    api.getProjects().then(setProjects).catch(console.error);
-  }, []);
-
-  const handleProjectSelect = async (index: number, option: any) => {
-    setSelectedTab("readme");
+  const handleProjectSelect = async (index: number, option: SelectOption) => {
+    setSelectedTab(Tabs.README);
   };
 
-  const handleSessionSelect = async (index: number, option: any) => {
+  const handleSessionSelect = async (index: number, option: SelectOption) => {
     console.log("handle session select!");
   };
 
-  const handleSelect = async (index: number, option: any) => {
+  const handleSelect = async (index: number, option: SelectOption | null) => {
+    if (!option) return;
     if (selectedTab === "sessions") handleSessionSelect(index, option);
     else handleProjectSelect(index, option);
   };
 
-  const handleOnChange = async (index: number, option: any) => {
-    const readme = await api.getProjectReadme(option.value);
+  const handleOnChange = async (index: number, option: SelectOption | null) => {
+    if (!option) return;
+    console.log("option:", option);
+    const selection = option.value as SelectableItem;
+    setCandidateSelection(selection);
+    setCandidateMenu(getMenuForItem(selection));
+    const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
 
-  const sections = [
-    { sectionTabName: "sessions", sectionType: "sessions", data: sessions },
-    { sectionTabName: "projects", sectionType: "projects", data: projects },
+  const ListSections: ListSection[] = [
+    { sectionTabName: "sessions", sectionType: Tabs.SESSIONS },
+    { sectionTabName: "projects", sectionType: Tabs.PROJECTS },
   ];
 
   return (
@@ -68,23 +74,22 @@ function App() {
     >
       <box flexDirection="row" maxHeight={"99%"}>
         <box width={"30%"}>
-          {sections.map((s, idx) => {
+          {ListSections.map((s, idx) => {
             return (
-              <ProjectSelection
+              <SelectableList
                 key={idx}
                 sectionHeader={`[${idx + 1}]-${s.sectionTabName}`}
                 sectionType={s.sectionType}
                 focoused={selectedTab == s.sectionTabName}
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
-                options={s.data}
               />
             );
           })}
         </box>
         <box
           border
-          borderColor={selectedTab === "readme" ? "yellow" : "white"}
+          borderColor={selectedTab === Tabs.README ? "yellow" : "white"}
           width={"70%"}
           title={"project's readme"}
           titleAlignment="center"
@@ -98,14 +103,16 @@ function App() {
                 },
               },
             }}
-            focused={selectedTab === "readme"}
+            focused={selectedTab === Tabs.README}
           >
             <text>{readme}</text>
           </scrollbox>
         </box>
       </box>
       <box>
-        <text>hi</text>
+        {candidateMenu?.map((item, idx) => {
+          return <text key={idx}>{item.label}</text>;
+        })}
       </box>
     </box>
   );
