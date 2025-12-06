@@ -1,5 +1,5 @@
 import type { SelectOption } from "@opentui/core";
-import type { Project, SelectableItem, Session } from "../../data/types";
+import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
 import { useEffect, useState } from "react";
 import { api } from "../../core";
 import {
@@ -7,8 +7,8 @@ import {
   sessionToSelectable,
 } from "../../utils/typeConversions";
 
-export interface SelectSectionProps {
-  sectionType: string;
+export interface SelectableListProps {
+  sectionType: SectionType;
   sectionHeader: string;
   handleSelect?: (index: number, option: SelectOption | null) => void;
   handleOnChange?: (index: number, option: SelectOption | null) => void;
@@ -25,23 +25,23 @@ export const converSelectableItemToSelectOption = (
   };
 };
 
-export function ProjectSelection({
+export function SelectableList({
   sectionType,
   sectionHeader,
   handleSelect,
   handleOnChange,
   focoused = false,
-}: SelectSectionProps) {
+}: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
 
   useEffect(() => {
-    if (sectionType === "sessions") {
+    if (sectionType == Tabs.SESSIONS) {
       api
         .getSessions()
         .then((sessions) => sessions.map(sessionToSelectable))
         .then(setData)
         .catch(console.error);
-    } else if (sectionType === "projects") {
+    } else if (sectionType === Tabs.PROJECTS) {
       api
         .getProjects()
         .then((projects) => projects.map(projectToSelectable))

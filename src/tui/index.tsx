@@ -1,11 +1,12 @@
 import { createCliRenderer, KeyEvent } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
-import React, { useEffect, useState } from "react";
-import { ProjectSelection } from "./components/ProjectSelection";
+import { useState } from "react";
+import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import {
   Tabs,
   type Project,
+  type Section,
   type SelectableItem,
   type Session,
 } from "../data/types";
@@ -14,10 +15,8 @@ function App() {
   const renderer = useRenderer();
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [candidateSelection, setCandidateSelection] = useState<{
-    type: SelectableItem;
-    value: Session | Project;
-  }>();
+  const [candidateSelection, setCandidateSelection] =
+    useState<SelectableItem>();
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -32,11 +31,6 @@ function App() {
       setSelectedTab(Tabs.PROJECTS);
     }
   });
-
-  // useEffect(() => {
-  //   api.getSessions().then(setSessions).catch(console.error);
-  //   api.getProjects().then(setProjects).catch(console.error);
-  // }, []);
 
   const handleProjectSelect = async (index: number, option: any) => {
     setSelectedTab(Tabs.README);
@@ -56,9 +50,9 @@ function App() {
     setReadme(readme);
   };
 
-  const sections = [
-    { sectionTabName: "sessions", sectionType: "sessions" },
-    { sectionTabName: "projects", sectionType: "projects" },
+  const sections: Section[] = [
+    { sectionTabName: "sessions", sectionType: Tabs.SESSIONS },
+    { sectionTabName: "projects", sectionType: Tabs.PROJECTS },
   ];
 
   return (
@@ -73,7 +67,7 @@ function App() {
         <box width={"30%"}>
           {sections.map((s, idx) => {
             return (
-              <ProjectSelection
+              <SelectableList
                 key={idx}
                 sectionHeader={`[${idx + 1}]-${s.sectionTabName}`}
                 sectionType={s.sectionType}
@@ -86,7 +80,7 @@ function App() {
         </box>
         <box
           border
-          borderColor={selectedTab === "readme" ? "yellow" : "white"}
+          borderColor={selectedTab === Tabs.README ? "yellow" : "white"}
           width={"70%"}
           title={"project's readme"}
           titleAlignment="center"
@@ -100,7 +94,7 @@ function App() {
                 },
               },
             }}
-            focused={selectedTab === "readme"}
+            focused={selectedTab === Tabs.README}
           >
             <text>{readme}</text>
           </scrollbox>

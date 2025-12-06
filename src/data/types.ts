@@ -16,8 +16,17 @@ export type SelectableItem =
   | ({ kind: "session" } & Session)
   | ({ kind: "project" } & Project);
 
+export type SelectableItemType = "session" | "project";
+
 export enum Tabs {
   SESSIONS = "sessions",
   PROJECTS = "projects",
   README = "readme",
 }
+
+export type SectionType = Exclude<Tabs, Tabs.README>;
+
+export type Section = {
+  sectionTabName: string;
+  sectionType: SectionType;
+};
