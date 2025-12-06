@@ -13,6 +13,10 @@ function App() {
     "sessions" | "projects" | "readme"
   >("sessions");
   const [readme, setReadme] = useState<string>("");
+  const [candidateSelection, setCandidateSelection] = useState<{
+    type: "session" | "project";
+    value: Session | Project;
+  }>();
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -27,7 +31,6 @@ function App() {
   });
 
   useEffect(() => {
-    // “fake calls” – they hit your mock API which reads JSON
     api.getSessions().then(setSessions).catch(console.error);
     api.getProjects().then(setProjects).catch(console.error);
   }, []);
@@ -40,14 +43,19 @@ function App() {
     console.log("handle session select!");
   };
 
+  const handleSelect = async (index: number, option: any) => {
+    if (selectedTab === "sessions") handleSessionSelect(index, option);
+    else handleProjectSelect(index, option);
+  };
+
   const handleOnChange = async (index: number, option: any) => {
     const readme = await api.getProjectReadme(option.value);
     setReadme(readme);
   };
 
   const sections = [
-    { sectionTabName: "sessions", data: sessions },
-    { sectionTabName: "projects", data: projects },
+    { sectionTabName: "sessions", sectionType: "sessions", data: sessions },
+    { sectionTabName: "projects", sectionType: "projects", data: projects },
   ];
 
   return (
@@ -57,48 +65,47 @@ function App() {
       borderStyle="rounded"
       title="lazymux"
       titleAlignment="center"
-      flexDirection="row"
     >
-      <box width={"30%"}>
-        {sections.map((s, idx) => {
-          return (
-            <ProjectSelection
-              key={idx}
-              sectionHeader={`[${idx + 1}]-${s.sectionTabName}`}
-              focoused={selectedTab == s.sectionTabName}
-              sectionName={s.sectionTabName}
-              handleSelect={
-                s.sectionTabName === "projects"
-                  ? handleProjectSelect
-                  : handleSessionSelect
-              }
-              handleOnChange={handleOnChange}
-              options={s.data}
-            />
-          );
-        })}
-      </box>
-      <box
-        border
-        borderColor={selectedTab === "readme" ? "yellow" : "white"}
-        width={"70%"}
-        title={"project's readme"}
-        titleAlignment="center"
-      >
-        <scrollbox
-          style={{
-            scrollbarOptions: {
-              // showArrows: true,
-              trackOptions: {
-                foregroundColor: "#7aa2f7",
-                backgroundColor: "#414868",
-              },
-            },
-          }}
-          focused={selectedTab === "readme"}
+      <box flexDirection="row" maxHeight={"99%"}>
+        <box width={"30%"}>
+          {sections.map((s, idx) => {
+            return (
+              <ProjectSelection
+                key={idx}
+                sectionHeader={`[${idx + 1}]-${s.sectionTabName}`}
+                sectionType={s.sectionType}
+                focoused={selectedTab == s.sectionTabName}
+                handleSelect={handleSelect}
+                handleOnChange={handleOnChange}
+                options={s.data}
+              />
+            );
+          })}
+        </box>
+        <box
+          border
+          borderColor={selectedTab === "readme" ? "yellow" : "white"}
+          width={"70%"}
+          title={"project's readme"}
+          titleAlignment="center"
         >
-          <text>{readme}</text>
-        </scrollbox>
+          <scrollbox
+            style={{
+              scrollbarOptions: {
+                trackOptions: {
+                  foregroundColor: "#7aa2f7",
+                  backgroundColor: "#414868",
+                },
+              },
+            }}
+            focused={selectedTab === "readme"}
+          >
+            <text>{readme}</text>
+          </scrollbox>
+        </box>
+      </box>
+      <box>
+        <text>hi</text>
       </box>
     </box>
   );

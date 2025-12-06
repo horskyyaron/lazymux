@@ -11,3 +11,7 @@ export interface Project {
   path: string;
   source: "local" | "remote";
 }
+
+export type SelectableItem =
+  | ({ kind: "session" } & Session)
+  | ({ kind: "project" } & Project);

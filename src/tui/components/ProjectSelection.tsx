@@ -1,10 +1,10 @@
 import type { SelectOption } from "@opentui/core";
 import type { Project, Session } from "../../data/types";
+import { useState } from "react";
 
 export interface SelectSectionProps {
   sectionHeader: string;
-  sectionName: string;
-  // options: SelectOption[];
+  sectionType: string;
   options: Project[] | Session[];
   handleSelect?: (index: number, option: SelectOption | null) => void;
   handleOnChange?: (index: number, option: SelectOption | null) => void;
@@ -13,12 +13,12 @@ export interface SelectSectionProps {
 
 export function ProjectSelection({
   sectionHeader,
-  sectionName,
   handleSelect,
   handleOnChange,
   focoused = false,
   options,
 }: SelectSectionProps) {
+  const [data, setData] = useState<Session | Project>();
   return (
     <box
       title={sectionHeader}
