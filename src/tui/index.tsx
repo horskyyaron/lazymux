@@ -1,4 +1,4 @@
-import { createCliRenderer, KeyEvent } from "@opentui/core";
+import { createCliRenderer, KeyEvent, type SelectOption } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import { useState } from "react";
 import { SelectableList } from "./components/SelectableList";
@@ -6,17 +6,20 @@ import { api } from "../core";
 import {
   Tabs,
   type Project,
-  type Section,
+  type ListSection,
   type SelectableItem,
   type Session,
 } from "../data/types";
+import { getMenuForItem, type Menu } from "../core/menu/menuGenerator";
 
 function App() {
   const renderer = useRenderer();
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [candidateSelection, setCandidateSelection] =
-    useState<SelectableItem>();
+    useState<SelectableItem | null>(null);
+  const [candidateMenu, setCandidateMenu] = useState<Menu | null>(null);
+  console.log(candidateMenu);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -32,25 +35,31 @@ function App() {
     }
   });
 
-  const handleProjectSelect = async (index: number, option: any) => {
+  const handleProjectSelect = async (index: number, option: SelectOption) => {
     setSelectedTab(Tabs.README);
   };
 
-  const handleSessionSelect = async (index: number, option: any) => {
+  const handleSessionSelect = async (index: number, option: SelectOption) => {
     console.log("handle session select!");
   };
 
-  const handleSelect = async (index: number, option: any) => {
+  const handleSelect = async (index: number, option: SelectOption | null) => {
+    if (!option) return;
     if (selectedTab === "sessions") handleSessionSelect(index, option);
     else handleProjectSelect(index, option);
   };
 
-  const handleOnChange = async (index: number, option: any) => {
-    const readme = await api.getProjectReadme(option.value);
+  const handleOnChange = async (index: number, option: SelectOption | null) => {
+    if (!option) return;
+    console.log("option:", option);
+    const selection = option.value as SelectableItem;
+    setCandidateSelection(selection);
+    setCandidateMenu(getMenuForItem(selection));
+    const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
 
-  const sections: Section[] = [
+  const ListSections: ListSection[] = [
     { sectionTabName: "sessions", sectionType: Tabs.SESSIONS },
     { sectionTabName: "projects", sectionType: Tabs.PROJECTS },
   ];
@@ -65,7 +74,7 @@ function App() {
     >
       <box flexDirection="row" maxHeight={"99%"}>
         <box width={"30%"}>
-          {sections.map((s, idx) => {
+          {ListSections.map((s, idx) => {
             return (
               <SelectableList
                 key={idx}
@@ -101,7 +110,9 @@ function App() {
         </box>
       </box>
       <box>
-        <text>hi</text>
+        {candidateMenu?.map((item, idx) => {
+          return <text key={idx}>{item.label}</text>;
+        })}
       </box>
     </box>
   );

@@ -26,7 +26,7 @@ export enum Tabs {
 
 export type SectionType = Exclude<Tabs, Tabs.README>;
 
-export type Section = {
+export type ListSection = {
   sectionTabName: string;
   sectionType: SectionType;
 };

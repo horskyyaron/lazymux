@@ -19,7 +19,8 @@ export const converSelectableItemToSelectOption = (
   item: SelectableItem,
 ): SelectOption => {
   return {
-    name: item.name,
+    name:
+      item.kind === "session" && item.isCurrent ? `🟢 ${item.name}` : item.name,
     description: "",
     value: item,
   };
