@@ -32,6 +32,8 @@ function App() {
       setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
       setSelectedTab(Tabs.PROJECTS);
+    } else if (key.name === "q") {
+      process.exit();
     }
   });
 
