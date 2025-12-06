@@ -3,16 +3,19 @@ import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import React, { useEffect, useState } from "react";
 import { ProjectSelection } from "./components/ProjectSelection";
 import { api } from "../core";
-import { Tabs, type Project, type Session } from "../data/types";
+import {
+  Tabs,
+  type Project,
+  type SelectableItem,
+  type Session,
+} from "../data/types";
 
 function App() {
   const renderer = useRenderer();
-  const [sessions, setSessions] = useState<Session[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [candidateSelection, setCandidateSelection] = useState<{
-    type: "session" | "project";
+    type: SelectableItem;
     value: Session | Project;
   }>();
 
@@ -30,10 +33,10 @@ function App() {
     }
   });
 
-  useEffect(() => {
-    api.getSessions().then(setSessions).catch(console.error);
-    api.getProjects().then(setProjects).catch(console.error);
-  }, []);
+  // useEffect(() => {
+  //   api.getSessions().then(setSessions).catch(console.error);
+  //   api.getProjects().then(setProjects).catch(console.error);
+  // }, []);
 
   const handleProjectSelect = async (index: number, option: any) => {
     setSelectedTab(Tabs.README);
@@ -54,8 +57,8 @@ function App() {
   };
 
   const sections = [
-    { sectionTabName: "sessions", sectionType: "sessions", data: sessions },
-    { sectionTabName: "projects", sectionType: "projects", data: projects },
+    { sectionTabName: "sessions", sectionType: "sessions" },
+    { sectionTabName: "projects", sectionType: "projects" },
   ];
 
   return (
@@ -77,7 +80,6 @@ function App() {
                 focoused={selectedTab == s.sectionTabName}
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
-                options={s.data}
               />
             );
           })}
