@@ -3,15 +3,13 @@ import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import React, { useEffect, useState } from "react";
 import { ProjectSelection } from "./components/ProjectSelection";
 import { api } from "../core";
-import type { Project, Session } from "../data/types";
+import { Tabs, type Project, type Session } from "../data/types";
 
 function App() {
   const renderer = useRenderer();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedTab, setSelectedTab] = useState<
-    "sessions" | "projects" | "readme"
-  >("sessions");
+  const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [candidateSelection, setCandidateSelection] = useState<{
     type: "session" | "project";
@@ -22,11 +20,13 @@ function App() {
     if (key.ctrl && key.name == "t") {
       renderer.console.toggle();
     } else if (key.name === "tab") {
-      setSelectedTab(selectedTab === "sessions" ? "projects" : "sessions");
+      setSelectedTab(
+        selectedTab === Tabs.SESSIONS ? Tabs.PROJECTS : Tabs.SESSIONS,
+      );
     } else if (key.name === "1") {
-      setSelectedTab("sessions");
+      setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
-      setSelectedTab("projects");
+      setSelectedTab(Tabs.PROJECTS);
     }
   });
 
@@ -36,7 +36,7 @@ function App() {
   }, []);
 
   const handleProjectSelect = async (index: number, option: any) => {
-    setSelectedTab("readme");
+    setSelectedTab(Tabs.README);
   };
 
   const handleSessionSelect = async (index: number, option: any) => {

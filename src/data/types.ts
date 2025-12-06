@@ -15,3 +15,9 @@ export interface Project {
 export type SelectableItem =
   | ({ kind: "session" } & Session)
   | ({ kind: "project" } & Project);
+
+export enum Tabs {
+  SESSIONS = "sessions",
+  PROJECTS = "projects",
+  README = "readme",
+}
