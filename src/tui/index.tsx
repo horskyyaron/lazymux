@@ -32,8 +32,12 @@ function App() {
     api.getProjects().then(setProjects).catch(console.error);
   }, []);
 
-  const handleSessionSelected = async (index: number, option: any) => {
-    console.log("selected");
+  const handleProjectSelect = async (index: number, option: any) => {
+    setSelectedTab("readme");
+  };
+
+  const handleSessionSelect = async (index: number, option: any) => {
+    console.log("handle session select!");
   };
 
   const handleOnChange = async (index: number, option: any) => {
@@ -60,10 +64,14 @@ function App() {
           return (
             <ProjectSelection
               key={idx}
-              sectionHeader={`[${idx}]-${s.sectionTabName}`}
+              sectionHeader={`[${idx + 1}]-${s.sectionTabName}`}
               focoused={selectedTab == s.sectionTabName}
               sectionName={s.sectionTabName}
-              handleSelect={handleSessionSelected}
+              handleSelect={
+                s.sectionTabName === "projects"
+                  ? handleProjectSelect
+                  : handleSessionSelect
+              }
               handleOnChange={handleOnChange}
               options={s.data}
             />
@@ -72,11 +80,25 @@ function App() {
       </box>
       <box
         border
+        borderColor={selectedTab === "readme" ? "yellow" : "white"}
         width={"70%"}
         title={"project's readme"}
         titleAlignment="center"
       >
-        <text>{readme}</text>
+        <scrollbox
+          style={{
+            scrollbarOptions: {
+              // showArrows: true,
+              trackOptions: {
+                foregroundColor: "#7aa2f7",
+                backgroundColor: "#414868",
+              },
+            },
+          }}
+          focused={selectedTab === "readme"}
+        >
+          <text>{readme}</text>
+        </scrollbox>
       </box>
     </box>
   );
