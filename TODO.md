@@ -1,10 +1,12 @@
 # TODO
 
-## Core
-
-- getState (projects + runnign sessions)
-- getProjectReadme (locally / github)
-- openProject - will create a tmux session for a new project and switch to it.
-- switchToSession - will move to a runnign session 
-- killSession - destroys runnign session.
-
+- [ ] generate correct menu based on the candidate (session or project)
+- [ ] readme tab highlight parser
+- [ ] fzf search in lists (projects and sessions)
+- [ ] keybinding support:
+    - [ ] session:
+        - [ ] kill
+        - [ ] switch-to
+- [ ] remote github projects (projectProvider):
+    - [ ] show 
+    - [ ] select: clone into selected folder (projects/) and start tmux session.
