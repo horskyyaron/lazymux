@@ -2,10 +2,10 @@
 
 - [ ] generate correct menu based on the candidate (session or project)
     - [X] menu for session
-    - [-] menu for project
+    - [x] menu for project
 - [ ] keybinding support:
     - [ ] session:
-        - [ ] kill
+        - [x] kill
         - [ ] switch-to
     - [ ] project:
         - [ ] delete project (move to archive, make it configurable)
