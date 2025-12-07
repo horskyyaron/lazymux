@@ -36,6 +36,10 @@ function App() {
     }
   });
 
+  const handleReadme = async () => {
+    setSelectedTab(Tabs.README);
+  };
+
   const handleProjectSelect = async (index: number, option: SelectOption) => {
     actionHandlers[Action.START_PROJECT_SESSION]({ name: option.name });
   };
@@ -84,6 +88,7 @@ function App() {
                 focoused={selectedTab == s.sectionTabName}
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
+                handleReadme={handleReadme}
               />
             );
           })}

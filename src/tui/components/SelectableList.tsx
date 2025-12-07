@@ -20,6 +20,7 @@ export interface SelectableListProps {
   sectionHeader: string;
   handleSelect: (index: number, option: SelectOption | null) => void;
   handleOnChange: (index: number, option: SelectOption | null) => void;
+  handleReadme: () => void;
   focoused: boolean;
 }
 
@@ -41,6 +42,7 @@ export function SelectableList({
   sectionHeader,
   handleSelect,
   handleOnChange,
+  handleReadme,
   focoused = false,
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
@@ -80,9 +82,14 @@ export function SelectableList({
   };
 
   useKeyboard((key: KeyEvent) => {
+    if (!data) return;
     if (focoused) {
       selectionKeybinding?.map(async (keymap) => {
         if (key.name === keymap.key) {
+          if (keymap.action === Action.FOCUS_ON_README) {
+            handleReadme();
+            return;
+          }
           // this means that the list is becoming shorter, if we are on the last item,
           // we need to dec the selected index by 1
           if (
