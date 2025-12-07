@@ -1,7 +1,7 @@
 import type { SelectableItem } from "../../data/types";
 
 export enum Action {
-  ATTACH_SESSION = "attach-session",
+  SWITCH_SESSION_CLIENT = "switch-client",
   KILL_SESSION = "kill-session",
   RENAME_SESSION = "rename-session",
   START_PROJECT_SESSION = "start-project-session",
@@ -11,7 +11,7 @@ export enum Action {
 }
 
 type SessionAction =
-  | Action.ATTACH_SESSION
+  | Action.SWITCH_SESSION_CLIENT
   | Action.KILL_SESSION
   | Action.FOCUS_ON_README
   | Action.RENAME_SESSION;
@@ -41,7 +41,7 @@ export function generateKeybindingFromSelectionItem(
         {
           key: "<enter>",
           label: "Attach",
-          action: Action.ATTACH_SESSION,
+          action: Action.SWITCH_SESSION_CLIENT,
         },
         {
           key: "x",

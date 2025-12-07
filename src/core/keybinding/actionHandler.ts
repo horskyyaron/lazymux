@@ -8,7 +8,7 @@ type ActionHandler = (payload: { name: string }) => Promise<boolean>;
 
 export const actionHandlers: Record<Action, ActionHandler> = {
   [Action.KILL_SESSION]: async ({ name }) => killTmuxSession(name),
-  [Action.ATTACH_SESSION]: async ({ name }) => switchTmuxSession(name),
+  [Action.SWITCH_SESSION_CLIENT]: async ({ name }) => switchTmuxSession(name),
   [Action.RENAME_SESSION]: async ({ name }) => {
     // placeholder
     console.log("rename session not implemented");

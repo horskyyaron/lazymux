@@ -5,10 +5,12 @@ import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import { Tabs, type ListSection, type SelectableItem } from "../data/types";
 import {
+  Action,
   generateKeybindingFromSelectionItem,
   getKeybindingDescription,
   type Keybinding,
 } from "../core/keybinding/keybinding";
+import { actionHandlers } from "../core/keybinding/actionHandler";
 
 function App() {
   const renderer = useRenderer();
@@ -35,11 +37,11 @@ function App() {
   });
 
   const handleProjectSelect = async (index: number, option: SelectOption) => {
-    return;
+    actionHandlers[Action.START_PROJECT_SESSION]({ name: option.name });
   };
 
   const handleSessionSelect = async (index: number, option: SelectOption) => {
-    console.log("handle session select!");
+    actionHandlers[Action.SWITCH_SESSION_CLIENT]({ name: option.name });
   };
 
   const handleSelect = async (index: number, option: SelectOption | null) => {
