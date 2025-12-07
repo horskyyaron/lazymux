@@ -47,3 +47,14 @@ export async function killTmuxSession(name: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function switchTmuxSession(name: string): Promise<boolean> {
+  try {
+    // Switch the active client to the target session
+    await run(`tmux switch-client -t ${name}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to switch session:", err);
+    return false;
+  }
+}

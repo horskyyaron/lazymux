@@ -8,12 +8,14 @@ import {
 } from "../../utils/typeConversions";
 import { useKeyboard } from "@opentui/react";
 import { killTmuxSession } from "../../adapters/multiplexer/tmux";
+import type { Menu } from "../../core/menu/menuGenerator";
 
 export interface SelectableListProps {
   sectionType: SectionType;
   sectionHeader: string;
   handleSelect: (index: number, option: SelectOption | null) => void;
   handleOnChange: (index: number, option: SelectOption | null) => void;
+  keybindings: Menu;
   focoused: boolean;
 }
 
@@ -35,6 +37,7 @@ export function SelectableList({
   sectionHeader,
   handleSelect,
   handleOnChange,
+  keybindings,
   focoused = false,
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
@@ -67,8 +70,14 @@ export function SelectableList({
   useKeyboard((key: KeyEvent) => {
     if (focoused) {
       if (sectionType === Tabs.SESSIONS) {
+        // use this menu for building the funcitonaliity
+        keybindings.map((keybinding) => {});
         if (key.name == "x") {
-          killTmuxSession(data![selectedIdx]?.name || "");
+          api.killSession(data![selectedIdx]?.name || "");
+          refetch();
+        }
+        if (key.name == "enter") {
+          api.switchSession(data![selectedIdx]?.name || "");
           refetch();
         }
       } else if (sectionType === Tabs.PROJECTS) {
