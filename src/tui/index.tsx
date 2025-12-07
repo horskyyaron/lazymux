@@ -19,7 +19,6 @@ function App() {
   const [candidateSelection, setCandidateSelection] =
     useState<SelectableItem | null>(null);
   const [candidateMenu, setCandidateMenu] = useState<string>("");
-  console.log(candidateMenu);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -32,13 +31,15 @@ function App() {
       setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
       setSelectedTab(Tabs.PROJECTS);
+    } else if (key.name === "r") {
+      setSelectedTab(Tabs.README);
     } else if (key.name === "q") {
       process.exit();
     }
   });
 
   const handleProjectSelect = async (index: number, option: SelectOption) => {
-    setSelectedTab(Tabs.README);
+    return;
   };
 
   const handleSessionSelect = async (index: number, option: SelectOption) => {
@@ -47,8 +48,9 @@ function App() {
 
   const handleSelect = async (index: number, option: SelectOption | null) => {
     if (!option) return;
-    if (selectedTab === "sessions") handleSessionSelect(index, option);
-    else handleProjectSelect(index, option);
+    selectedTab === Tabs.SESSIONS
+      ? handleSessionSelect(index, option)
+      : handleProjectSelect(index, option);
   };
 
   const handleOnChange = async (index: number, option: SelectOption | null) => {

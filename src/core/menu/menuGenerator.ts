@@ -1,33 +1,55 @@
 import type { SelectableItem } from "../../data/types";
 
-export type ActionId =
-  | "attach-session"
-  | "kill-session"
-  | "rename-session"
-  | "start-project-session"
-  | "open-project-folder";
-
-export interface KeyBinding {
-  key: string; // e.g. "enter", "x", "r", "o"
-  label: string; // human readable: "Attach", "Kill session", ...
-  action: ActionId;
+export enum Action {
+  ATTACH_SESSION = "attach-session",
+  KILL_SESSION = "kill-session",
+  RENAME_SESSION = "rename-session",
+  START_PROJECT_SESSION = "start-project-session",
+  OPEN_PROJECT_FOLDER = "open-project-folder",
+  DELETE_PROJECT_FOLDER = "delete-project-folder",
+  FOCUS_ON_README = "focus-on-readme",
 }
 
-export type Menu = KeyBinding[];
+type SessionAction =
+  | Action.ATTACH_SESSION
+  | Action.KILL_SESSION
+  | Action.FOCUS_ON_README
+  | Action.RENAME_SESSION;
+
+type ProjectAction =
+  | Action.START_PROJECT_SESSION
+  | Action.OPEN_PROJECT_FOLDER
+  | Action.FOCUS_ON_README
+  | Action.DELETE_PROJECT_FOLDER;
+
+export interface KeyBinding<A extends Action = Action> {
+  key: string; // e.g. "enter", "x", "r", "o"
+  label: string; // human readable: "Attach", "Kill session", ...
+  action: A;
+}
+
+export type Menu<A extends Action = Action> = KeyBinding<A>[];
+type SessionMenu = Menu<SessionAction>;
+type ProjectMenu = Menu<ProjectAction>;
 
 function getMenuForItem(item: SelectableItem): Menu {
   switch (item.kind) {
     case "session": {
-      const menu: Menu = [
+      const menu: SessionMenu = [
         {
           key: "<enter>",
           label: "Attach",
-          action: "attach-session",
+          action: Action.ATTACH_SESSION,
         },
         {
           key: "x",
           label: "Kill",
-          action: "kill-session",
+          action: Action.KILL_SESSION,
+        },
+        {
+          key: "r",
+          label: "Readme",
+          action: Action.FOCUS_ON_README,
         },
       ];
 
@@ -45,18 +67,29 @@ function getMenuForItem(item: SelectableItem): Menu {
     }
 
     case "project": {
-      return [
+      const menu: ProjectMenu = [
         {
-          key: "enter",
-          label: "Start tmux session",
-          action: "start-project-session",
+          key: "<enter>",
+          label: "Start session",
+          action: Action.START_PROJECT_SESSION,
         },
         {
           key: "o",
-          label: "Open project folder",
-          action: "open-project-folder",
+          label: "Open",
+          action: Action.OPEN_PROJECT_FOLDER,
+        },
+        {
+          key: "d",
+          label: "Delete",
+          action: Action.DELETE_PROJECT_FOLDER,
+        },
+        {
+          key: "r",
+          label: "Readme",
+          action: Action.FOCUS_ON_README,
         },
       ];
+      return menu;
     }
   }
 }
