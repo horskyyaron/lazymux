@@ -1,4 +1,4 @@
-import type { SelectOption, TabSelect } from "@opentui/core";
+import type { KeyEvent, SelectOption, TabSelect } from "@opentui/core";
 import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
 import { useEffect, useState } from "react";
 import { api } from "../../core";
@@ -6,6 +6,7 @@ import {
   projectToSelectable,
   sessionToSelectable,
 } from "../../utils/typeConversions";
+import { useKeyboard } from "@opentui/react";
 
 export interface SelectableListProps {
   sectionType: SectionType;
@@ -37,6 +38,18 @@ export function SelectableList({
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
   const [selectedIdx, setSelectedIdx] = useState<number>(0);
+
+  useKeyboard((key: KeyEvent) => {
+    if (focoused) {
+      if (sectionType === Tabs.SESSIONS) {
+        if (key.name == "x") {
+          console.log("x in sessions");
+        }
+      } else if (sectionType === Tabs.PROJECTS) {
+        console.log("x in projects");
+      }
+    }
+  });
 
   useEffect(() => {
     if (!data) {
