@@ -22,17 +22,19 @@ type ProjectAction =
   | Action.FOCUS_ON_README
   | Action.DELETE_PROJECT_FOLDER;
 
-export interface KeyBinding<A extends Action = Action> {
+export interface KeyBindingInfo<A extends Action = Action> {
   key: string; // e.g. "enter", "x", "r", "o"
   label: string; // human readable: "Attach", "Kill session", ...
   action: A;
 }
 
-export type Menu<A extends Action = Action> = KeyBinding<A>[];
-type SessionMenu = Menu<SessionAction>;
-type ProjectMenu = Menu<ProjectAction>;
+export type Keybinding<A extends Action = Action> = KeyBindingInfo<A>[];
+type SessionMenu = Keybinding<SessionAction>;
+type ProjectMenu = Keybinding<ProjectAction>;
 
-export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
+export function generateKeybindingFromSelectionItem(
+  item: SelectableItem,
+): Keybinding {
   switch (item.kind) {
     case "session": {
       const menu: SessionMenu = [
@@ -94,13 +96,15 @@ export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
   }
 }
 
-export function getMenuDescription(menu: Menu | null): string {
-  if (!menu) return "";
+export function getKeybindingDescription(
+  keybinding: Keybinding | null,
+): string {
+  if (!keybinding) return "";
   let menuLine = "";
-  menu.map((action, idx) => {
+  keybinding.map((action, idx) => {
     menuLine =
       menuLine +
-      `${action.label}: ${action.key}${idx != menu.length - 1 ? " | " : ""}`;
+      `${action.label}: ${action.key}${idx != keybinding.length - 1 ? " | " : ""}`;
   });
   return menuLine;
 }

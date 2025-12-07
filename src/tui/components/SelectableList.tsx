@@ -7,15 +7,16 @@ import {
   sessionToSelectable,
 } from "../../utils/typeConversions";
 import { useKeyboard } from "@opentui/react";
-import { killTmuxSession } from "../../adapters/multiplexer/tmux";
-import type { Menu } from "../../core/menu/menuGenerator";
+import {
+  generateKeybindingFromSelectionItem,
+  type Keybinding,
+} from "../../core/menu/keybinding";
 
 export interface SelectableListProps {
   sectionType: SectionType;
   sectionHeader: string;
   handleSelect: (index: number, option: SelectOption | null) => void;
   handleOnChange: (index: number, option: SelectOption | null) => void;
-  keybindings: Menu;
   focoused: boolean;
 }
 
@@ -37,52 +38,46 @@ export function SelectableList({
   sectionHeader,
   handleSelect,
   handleOnChange,
-  keybindings,
   focoused = false,
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
   const [selectedIdx, setSelectedIdx] = useState<number>(0);
+  const [selectionKeybinding, setSelectionKeybinding] =
+    useState<Keybinding | null>(null);
 
   const refetch = () => {
-    if (sectionType == Tabs.SESSIONS) {
-      api
-        .getSessions()
-        .then((sessions) => sessions.map(sessionToSelectable))
-        .then((items) => {
-          setData(items);
-          console.log("first time on change");
-          // triggers on chane on first load to populate the menu line since no "onFocus" event exists
-          handleOnChange(
-            selectedIdx,
-            converSelectableItemToSelectOption(items[selectedIdx]!),
-          );
-        })
-        .catch(console.error);
-    } else if (sectionType === Tabs.PROJECTS) {
-      api
-        .getProjects()
-        .then((projects) => projects.map(projectToSelectable))
-        .then(setData)
-        .catch(console.error);
-    }
+    const apiCall: () => Promise<SelectableItem[]> =
+      sectionType === Tabs.SESSIONS
+        ? () =>
+            api
+              .getSessions()
+              .then((sessions) => sessions.map(sessionToSelectable))
+        : () =>
+            api
+              .getProjects()
+              .then((projects) => projects.map(projectToSelectable));
+
+    apiCall()
+      .then((items) => {
+        setData(items);
+        handleOnChange(
+          selectedIdx,
+          converSelectableItemToSelectOption(items[selectedIdx]!),
+        );
+        setSelectionKeybinding(
+          generateKeybindingFromSelectionItem(items[selectedIdx]!),
+        );
+      })
+      .catch(console.error);
   };
 
   useKeyboard((key: KeyEvent) => {
     if (focoused) {
-      if (sectionType === Tabs.SESSIONS) {
-        // use this menu for building the funcitonaliity
-        keybindings.map((keybinding) => {});
-        if (key.name == "x") {
-          api.killSession(data![selectedIdx]?.name || "");
-          refetch();
+      selectionKeybinding?.map((keymap) => {
+        if (key.name === keymap.key) {
+          console.log(keymap.action);
         }
-        if (key.name == "enter") {
-          api.switchSession(data![selectedIdx]?.name || "");
-          refetch();
-        }
-      } else if (sectionType === Tabs.PROJECTS) {
-        console.log("x in projects");
-      }
+      });
     }
   });
 
