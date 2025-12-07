@@ -6,6 +6,7 @@ import { api } from "../core";
 import { Tabs, type ListSection, type SelectableItem } from "../data/types";
 import {
   Action,
+  generateKeybindingForReadme,
   generateKeybindingFromSelectionItem,
   getKeybindingDescription,
   type Keybinding,
@@ -17,6 +18,7 @@ function App() {
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [keybinding, setKeybinding] = useState<Keybinding | null>(null);
+  const [previousTab, setPreviousTab] = useState<Tabs>(Tabs.SESSIONS);
   const [currentSelection, setCurrentSelection] =
     useState<SelectableItem | null>(null);
 
@@ -31,13 +33,17 @@ function App() {
       setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
       setSelectedTab(Tabs.PROJECTS);
+    } else if (key.name === "h") {
+      setSelectedTab(previousTab);
     } else if (key.name === "q") {
       process.exit();
     }
   });
 
   const handleReadme = async () => {
+    setPreviousTab(selectedTab);
     setSelectedTab(Tabs.README);
+    setKeybinding(generateKeybindingForReadme());
   };
 
   const handleProjectSelect = async (index: number, option: SelectOption) => {

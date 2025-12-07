@@ -8,6 +8,7 @@ export enum Action {
   OPEN_PROJECT_FOLDER = "open-project-folder",
   DELETE_PROJECT_FOLDER = "delete-project-folder",
   FOCUS_ON_README = "focus-on-readme",
+  PREVIOUS_TAB = "previous-tab",
 }
 
 type SessionAction =
@@ -100,6 +101,28 @@ export function generateKeybindingFromSelectionItem(
       return keybinding;
     }
   }
+}
+
+export function generateKeybindingForReadme(): Keybinding {
+  const keybinding: Keybinding = [
+    {
+      key: "h",
+      label: "Previous Tab",
+      action: Action.PREVIOUS_TAB,
+    },
+  ];
+
+  // // Example: dynamic options based on state
+  // if (item.isCurrent) {
+  //   // maybe add a "mark as current" or something
+  //   menu.push({
+  //     key: "x",
+  //     action: Action.ATTACH_SESSION,
+  //     label: "🟢 current session",
+  //   });
+  // }
+
+  return keybinding;
 }
 
 export function getKeybindingDescription(
