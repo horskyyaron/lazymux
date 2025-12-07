@@ -8,7 +8,7 @@ import {
   generateKeybindingFromSelectionItem,
   getKeybindingDescription,
   type Keybinding,
-} from "../core/menu/keybinding";
+} from "../core/keybinding/keybinding";
 
 function App() {
   const renderer = useRenderer();

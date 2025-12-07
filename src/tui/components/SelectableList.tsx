@@ -10,7 +10,8 @@ import { useKeyboard } from "@opentui/react";
 import {
   generateKeybindingFromSelectionItem,
   type Keybinding,
-} from "../../core/menu/keybinding";
+} from "../../core/keybinding/keybinding";
+import { actionHandlers } from "../../core/keybinding/actionHandler";
 
 export interface SelectableListProps {
   sectionType: SectionType;
@@ -45,7 +46,7 @@ export function SelectableList({
   const [selectionKeybinding, setSelectionKeybinding] =
     useState<Keybinding | null>(null);
 
-  const refetch = () => {
+  const refetch = async () => {
     const apiCall: () => Promise<SelectableItem[]> =
       sectionType === Tabs.SESSIONS
         ? () =>
@@ -62,10 +63,14 @@ export function SelectableList({
         setData(items);
         handleOnChange(
           selectedIdx,
-          converSelectableItemToSelectOption(items[selectedIdx]!),
+          converSelectableItemToSelectOption(
+            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
+          ),
         );
         setSelectionKeybinding(
-          generateKeybindingFromSelectionItem(items[selectedIdx]!),
+          generateKeybindingFromSelectionItem(
+            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
+          ),
         );
       })
       .catch(console.error);
@@ -73,9 +78,15 @@ export function SelectableList({
 
   useKeyboard((key: KeyEvent) => {
     if (focoused) {
-      selectionKeybinding?.map((keymap) => {
+      selectionKeybinding?.map(async (keymap) => {
         if (key.name === keymap.key) {
-          console.log(keymap.action);
+          await actionHandlers[keymap.action]({
+            name: data![selectedIdx]?.name!,
+          });
+          if (selectedIdx == data?.length) {
+            setSelectedIdx(selectedIdx - 2);
+          }
+          await refetch();
         }
       });
     }

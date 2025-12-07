@@ -60,7 +60,7 @@ export function generateKeybindingFromSelectionItem(
       //   // maybe add a "mark as current" or something
       //   menu.push({
       //     key: "x",
-      //     action: "attach-session",
+      //     action: Action.ATTACH_SESSION,
       //     label: "🟢 current session",
       //   });
       // }

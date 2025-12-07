@@ -17,16 +17,12 @@ export async function getTmuxSessions(): Promise<Session[]> {
     .trim()
     .split("\n")
     .filter(Boolean);
-
   const current = (await run("tmux display-message -p '#S'")).trim();
-
   const sessions: Session[] = [];
-
   for (const name of names) {
     const path = (
       await run(`tmux display-message -p -t ${name} '#{pane_current_path}'`)
     ).trim();
-
     sessions.push({
       id: name,
       name,
@@ -34,7 +30,6 @@ export async function getTmuxSessions(): Promise<Session[]> {
       isCurrent: name === current,
     });
   }
-
   return sessions;
 }
 
