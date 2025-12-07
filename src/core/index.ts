@@ -1,4 +1,8 @@
-import { getTmuxSessions, killTmuxSession } from "../adapters/multiplexer/tmux";
+import {
+  getTmuxSessions,
+  killTmuxSession,
+  switchTmuxSession,
+} from "../adapters/multiplexer/tmux";
 import { getProjectsDirectories } from "../adapters/projectProviders/localFs";
 import { getReadme } from "../adapters/readme/localFs";
 import type { Project, Session } from "../data/types";
@@ -21,6 +25,11 @@ export const api = {
 
   async killSession(name: string) {
     const result = await killTmuxSession(name);
+    return result;
+  },
+
+  async switchSession(name: string) {
+    const result = await switchTmuxSession(name);
     return result;
   },
 };

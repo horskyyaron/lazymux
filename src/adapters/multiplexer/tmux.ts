@@ -17,16 +17,12 @@ export async function getTmuxSessions(): Promise<Session[]> {
     .trim()
     .split("\n")
     .filter(Boolean);
-
   const current = (await run("tmux display-message -p '#S'")).trim();
-
   const sessions: Session[] = [];
-
   for (const name of names) {
     const path = (
       await run(`tmux display-message -p -t ${name} '#{pane_current_path}'`)
     ).trim();
-
     sessions.push({
       id: name,
       name,
@@ -34,7 +30,6 @@ export async function getTmuxSessions(): Promise<Session[]> {
       isCurrent: name === current,
     });
   }
-
   return sessions;
 }
 
@@ -44,6 +39,17 @@ export async function killTmuxSession(name: string): Promise<boolean> {
     return true;
   } catch (err) {
     console.error("Failed to kill session:", err);
+    return false;
+  }
+}
+
+export async function switchTmuxSession(name: string): Promise<boolean> {
+  try {
+    // Switch the active client to the target session
+    await run(`tmux switch-client -t ${name}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to switch session:", err);
     return false;
   }
 }

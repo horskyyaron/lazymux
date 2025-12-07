@@ -1,7 +1,7 @@
 import type { SelectableItem } from "../../data/types";
 
 export enum Action {
-  ATTACH_SESSION = "attach-session",
+  SWITCH_SESSION_CLIENT = "switch-client",
   KILL_SESSION = "kill-session",
   RENAME_SESSION = "rename-session",
   START_PROJECT_SESSION = "start-project-session",
@@ -11,7 +11,7 @@ export enum Action {
 }
 
 type SessionAction =
-  | Action.ATTACH_SESSION
+  | Action.SWITCH_SESSION_CLIENT
   | Action.KILL_SESSION
   | Action.FOCUS_ON_README
   | Action.RENAME_SESSION;
@@ -22,24 +22,26 @@ type ProjectAction =
   | Action.FOCUS_ON_README
   | Action.DELETE_PROJECT_FOLDER;
 
-export interface KeyBinding<A extends Action = Action> {
+export interface KeyBindingInfo<A extends Action = Action> {
   key: string; // e.g. "enter", "x", "r", "o"
   label: string; // human readable: "Attach", "Kill session", ...
   action: A;
 }
 
-export type Menu<A extends Action = Action> = KeyBinding<A>[];
-type SessionMenu = Menu<SessionAction>;
-type ProjectMenu = Menu<ProjectAction>;
+export type Keybinding<A extends Action = Action> = KeyBindingInfo<A>[];
+type SessionMenu = Keybinding<SessionAction>;
+type ProjectMenu = Keybinding<ProjectAction>;
 
-export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
+export function generateKeybindingFromSelectionItem(
+  item: SelectableItem,
+): Keybinding {
   switch (item.kind) {
     case "session": {
       const menu: SessionMenu = [
         {
           key: "<enter>",
           label: "Attach",
-          action: Action.ATTACH_SESSION,
+          action: Action.SWITCH_SESSION_CLIENT,
         },
         {
           key: "x",
@@ -58,7 +60,7 @@ export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
       //   // maybe add a "mark as current" or something
       //   menu.push({
       //     key: "x",
-      //     action: "attach-session",
+      //     action: Action.ATTACH_SESSION,
       //     label: "🟢 current session",
       //   });
       // }
@@ -94,13 +96,15 @@ export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
   }
 }
 
-export function getMenuDescription(menu: Menu | null): string {
-  if (!menu) return "";
+export function getKeybindingDescription(
+  keybinding: Keybinding | null,
+): string {
+  if (!keybinding) return "";
   let menuLine = "";
-  menu.map((action, idx) => {
+  keybinding.map((action, idx) => {
     menuLine =
       menuLine +
-      `${action.label}: ${action.key}${idx != menu.length - 1 ? " | " : ""}`;
+      `${action.label}: ${action.key}${idx != keybinding.length - 1 ? " | " : ""}`;
   });
   return menuLine;
 }

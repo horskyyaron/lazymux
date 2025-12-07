@@ -3,25 +3,20 @@ import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import { useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
+import { Tabs, type ListSection, type SelectableItem } from "../data/types";
 import {
-  Tabs,
-  type Project,
-  type ListSection,
-  type SelectableItem,
-  type Session,
-} from "../data/types";
-import {
-  generateMenuFromSelectionItem,
-  getMenuDescription,
-  type Menu,
-} from "../core/menu/menuGenerator";
-import { killTmuxSession } from "../adapters/multiplexer/tmux";
+  Action,
+  generateKeybindingFromSelectionItem,
+  getKeybindingDescription,
+  type Keybinding,
+} from "../core/keybinding/keybinding";
+import { actionHandlers } from "../core/keybinding/actionHandler";
 
 function App() {
   const renderer = useRenderer();
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [menu, setMenu] = useState<Menu | null>(null);
+  const [keybinding, setKeybinding] = useState<Keybinding | null>(null);
   const [currentSelection, setCurrentSelection] =
     useState<SelectableItem | null>(null);
 
@@ -36,19 +31,17 @@ function App() {
       setSelectedTab(Tabs.SESSIONS);
     } else if (key.name === "2") {
       setSelectedTab(Tabs.PROJECTS);
-    } else if (key.name === "r") {
-      setSelectedTab(Tabs.README);
     } else if (key.name === "q") {
       process.exit();
     }
   });
 
   const handleProjectSelect = async (index: number, option: SelectOption) => {
-    return;
+    actionHandlers[Action.START_PROJECT_SESSION]({ name: option.name });
   };
 
   const handleSessionSelect = async (index: number, option: SelectOption) => {
-    console.log("handle session select!");
+    actionHandlers[Action.SWITCH_SESSION_CLIENT]({ name: option.name });
   };
 
   const handleSelect = async (index: number, option: SelectOption | null) => {
@@ -62,7 +55,7 @@ function App() {
     if (!option) return;
     const selection = option.value as SelectableItem;
     setCurrentSelection(selection);
-    setMenu(generateMenuFromSelectionItem(selection));
+    setKeybinding(generateKeybindingFromSelectionItem(selection));
     const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
@@ -118,7 +111,7 @@ function App() {
         </box>
       </box>
       <box flexDirection="row">
-        <text>{getMenuDescription(menu)}</text>
+        <text>{getKeybindingDescription(keybinding)}</text>
       </box>
     </box>
   );

@@ -7,7 +7,11 @@ import {
   sessionToSelectable,
 } from "../../utils/typeConversions";
 import { useKeyboard } from "@opentui/react";
-import { killTmuxSession } from "../../adapters/multiplexer/tmux";
+import {
+  generateKeybindingFromSelectionItem,
+  type Keybinding,
+} from "../../core/keybinding/keybinding";
+import { actionHandlers } from "../../core/keybinding/actionHandler";
 
 export interface SelectableListProps {
   sectionType: SectionType;
@@ -39,41 +43,52 @@ export function SelectableList({
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
   const [selectedIdx, setSelectedIdx] = useState<number>(0);
+  const [selectionKeybinding, setSelectionKeybinding] =
+    useState<Keybinding | null>(null);
 
-  const refetch = () => {
-    if (sectionType == Tabs.SESSIONS) {
-      api
-        .getSessions()
-        .then((sessions) => sessions.map(sessionToSelectable))
-        .then((items) => {
-          setData(items);
-          console.log("first time on change");
-          // triggers on chane on first load to populate the menu line since no "onFocus" event exists
-          handleOnChange(
-            selectedIdx,
-            converSelectableItemToSelectOption(items[selectedIdx]!),
-          );
-        })
-        .catch(console.error);
-    } else if (sectionType === Tabs.PROJECTS) {
-      api
-        .getProjects()
-        .then((projects) => projects.map(projectToSelectable))
-        .then(setData)
-        .catch(console.error);
-    }
+  const refetch = async () => {
+    const apiCall: () => Promise<SelectableItem[]> =
+      sectionType === Tabs.SESSIONS
+        ? () =>
+            api
+              .getSessions()
+              .then((sessions) => sessions.map(sessionToSelectable))
+        : () =>
+            api
+              .getProjects()
+              .then((projects) => projects.map(projectToSelectable));
+
+    apiCall()
+      .then((items) => {
+        setData(items);
+        handleOnChange(
+          selectedIdx,
+          converSelectableItemToSelectOption(
+            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
+          ),
+        );
+        setSelectionKeybinding(
+          generateKeybindingFromSelectionItem(
+            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
+          ),
+        );
+      })
+      .catch(console.error);
   };
 
   useKeyboard((key: KeyEvent) => {
     if (focoused) {
-      if (sectionType === Tabs.SESSIONS) {
-        if (key.name == "x") {
-          killTmuxSession(data![selectedIdx]?.name || "");
-          refetch();
+      selectionKeybinding?.map(async (keymap) => {
+        if (key.name === keymap.key) {
+          await actionHandlers[keymap.action]({
+            name: data![selectedIdx]?.name!,
+          });
+          if (selectedIdx == data?.length) {
+            setSelectedIdx(selectedIdx - 2);
+          }
+          await refetch();
         }
-      } else if (sectionType === Tabs.PROJECTS) {
-        console.log("x in projects");
-      }
+      });
     }
   });
 
