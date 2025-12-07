@@ -31,15 +31,15 @@ function getMenuForItem(item: SelectableItem): Menu {
         },
       ];
 
-      // Example: dynamic options based on state
-      if (item.isCurrent) {
-        // maybe add a "mark as current" or something
-        menu.push({
-          key: "x",
-          action: "attach-session",
-          label: "🟢 current session",
-        });
-      }
+      // // Example: dynamic options based on state
+      // if (item.isCurrent) {
+      //   // maybe add a "mark as current" or something
+      //   menu.push({
+      //     key: "x",
+      //     action: "attach-session",
+      //     label: "🟢 current session",
+      //   });
+      // }
 
       return menu;
     }

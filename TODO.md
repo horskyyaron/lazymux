@@ -1,7 +1,7 @@
 # TODO
 
 - [ ] generate correct menu based on the candidate (session or project)
-    - [-] menu for session
+    - [X] menu for session
     - [ ] menu for project
 - [ ] readme tab highlight parser
 - [ ] fzf search in lists (projects and sessions)
