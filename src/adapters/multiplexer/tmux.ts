@@ -37,3 +37,13 @@ export async function getTmuxSessions(): Promise<Session[]> {
 
   return sessions;
 }
+
+export async function killTmuxSession(name: string): Promise<boolean> {
+  try {
+    await run(`tmux kill-session -t ${name}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to kill session:", err);
+    return false;
+  }
+}

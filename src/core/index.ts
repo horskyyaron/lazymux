@@ -1,4 +1,4 @@
-import { getTmuxSessions } from "../adapters/multiplexer/tmux";
+import { getTmuxSessions, killTmuxSession } from "../adapters/multiplexer/tmux";
 import { getProjectsDirectories } from "../adapters/projectProviders/localFs";
 import { getReadme } from "../adapters/readme/localFs";
 import type { Project, Session } from "../data/types";
@@ -17,5 +17,10 @@ export const api = {
   async getProjectReadme(source: Project | Session): Promise<string> {
     const readme = await getReadme(source);
     return readme;
+  },
+
+  async killSession(name: string) {
+    const result = await killTmuxSession(name);
+    return result;
   },
 };

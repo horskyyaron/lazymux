@@ -1,4 +1,4 @@
-import type { SelectOption, TabSelect } from "@opentui/core";
+import type { KeyEvent, SelectOption, TabSelect } from "@opentui/core";
 import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
 import { useEffect, useState } from "react";
 import { api } from "../../core";
@@ -6,6 +6,8 @@ import {
   projectToSelectable,
   sessionToSelectable,
 } from "../../utils/typeConversions";
+import { useKeyboard } from "@opentui/react";
+import { killTmuxSession } from "../../adapters/multiplexer/tmux";
 
 export interface SelectableListProps {
   sectionType: SectionType;
@@ -38,29 +40,46 @@ export function SelectableList({
   const [data, setData] = useState<SelectableItem[]>();
   const [selectedIdx, setSelectedIdx] = useState<number>(0);
 
+  const refetch = () => {
+    if (sectionType == Tabs.SESSIONS) {
+      api
+        .getSessions()
+        .then((sessions) => sessions.map(sessionToSelectable))
+        .then((items) => {
+          setData(items);
+          console.log("first time on change");
+          // triggers on chane on first load to populate the menu line since no "onFocus" event exists
+          handleOnChange(
+            selectedIdx,
+            converSelectableItemToSelectOption(items[selectedIdx]!),
+          );
+        })
+        .catch(console.error);
+    } else if (sectionType === Tabs.PROJECTS) {
+      api
+        .getProjects()
+        .then((projects) => projects.map(projectToSelectable))
+        .then(setData)
+        .catch(console.error);
+    }
+  };
+
+  useKeyboard((key: KeyEvent) => {
+    if (focoused) {
+      if (sectionType === Tabs.SESSIONS) {
+        if (key.name == "x") {
+          killTmuxSession(data![selectedIdx]?.name || "");
+          refetch();
+        }
+      } else if (sectionType === Tabs.PROJECTS) {
+        console.log("x in projects");
+      }
+    }
+  });
+
   useEffect(() => {
     if (!data) {
-      if (sectionType == Tabs.SESSIONS) {
-        api
-          .getSessions()
-          .then((sessions) => sessions.map(sessionToSelectable))
-          .then((items) => {
-            setData(items);
-            console.log("first time on change");
-            // triggers on chane on first load to populate the menu line since no "onFocus" event exists
-            handleOnChange(
-              selectedIdx,
-              converSelectableItemToSelectOption(items[selectedIdx]!),
-            );
-          })
-          .catch(console.error);
-      } else if (sectionType === Tabs.PROJECTS) {
-        api
-          .getProjects()
-          .then((projects) => projects.map(projectToSelectable))
-          .then(setData)
-          .catch(console.error);
-      }
+      refetch();
     } else {
       if (!focoused) return;
       handleOnChange(
