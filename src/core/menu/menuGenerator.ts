@@ -15,24 +15,19 @@ export interface KeyBinding {
 
 export type Menu = KeyBinding[];
 
-export function getMenuForItem(item: SelectableItem): Menu {
+function getMenuForItem(item: SelectableItem): Menu {
   switch (item.kind) {
     case "session": {
       const menu: Menu = [
         {
-          key: "enter",
-          label: "Attach session",
+          key: "<enter>",
+          label: "Attach",
           action: "attach-session",
         },
         {
           key: "x",
-          label: "Kill session",
+          label: "Kill",
           action: "kill-session",
-        },
-        {
-          key: "r",
-          label: "Rename session",
-          action: "rename-session",
         },
       ];
 
@@ -64,4 +59,16 @@ export function getMenuForItem(item: SelectableItem): Menu {
       ];
     }
   }
+}
+
+export function generateMenuLineForItem(item: SelectableItem): string {
+  const menu = getMenuForItem(item);
+  let menuLine = "";
+  menu.map((action, idx) => {
+    menuLine =
+      menuLine +
+      `${action.label}: ${action.key}${idx != menu.length - 1 ? " | " : ""}`;
+  });
+  console.log("menu line after concat", menuLine);
+  return menuLine;
 }
