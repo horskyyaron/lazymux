@@ -102,6 +102,5 @@ export function generateMenuLineForItem(item: SelectableItem): string {
       menuLine +
       `${action.label}: ${action.key}${idx != menu.length - 1 ? " | " : ""}`;
   });
-  console.log("menu line after concat", menuLine);
   return menuLine;
 }

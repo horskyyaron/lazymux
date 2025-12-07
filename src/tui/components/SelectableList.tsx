@@ -1,4 +1,4 @@
-import type { SelectOption } from "@opentui/core";
+import type { SelectOption, TabSelect } from "@opentui/core";
 import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
 import { useEffect, useState } from "react";
 import { api } from "../../core";
@@ -10,8 +10,8 @@ import {
 export interface SelectableListProps {
   sectionType: SectionType;
   sectionHeader: string;
-  handleSelect?: (index: number, option: SelectOption | null) => void;
-  handleOnChange?: (index: number, option: SelectOption | null) => void;
+  handleSelect: (index: number, option: SelectOption | null) => void;
+  handleOnChange: (index: number, option: SelectOption | null) => void;
   focoused: boolean;
 }
 
@@ -36,22 +36,44 @@ export function SelectableList({
   focoused = false,
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();
+  const [selectedIdx, setSelectedIdx] = useState<number>(0);
 
   useEffect(() => {
-    if (sectionType == Tabs.SESSIONS) {
-      api
-        .getSessions()
-        .then((sessions) => sessions.map(sessionToSelectable))
-        .then(setData)
-        .catch(console.error);
-    } else if (sectionType === Tabs.PROJECTS) {
-      api
-        .getProjects()
-        .then((projects) => projects.map(projectToSelectable))
-        .then(setData)
-        .catch(console.error);
+    if (!data) {
+      if (sectionType == Tabs.SESSIONS) {
+        api
+          .getSessions()
+          .then((sessions) => sessions.map(sessionToSelectable))
+          .then((items) => {
+            setData(items);
+            console.log("first time on change");
+            // triggers on chane on first load to populate the menu line since no "onFocus" event exists
+            handleOnChange(
+              selectedIdx,
+              converSelectableItemToSelectOption(items[selectedIdx]!),
+            );
+          })
+          .catch(console.error);
+      } else if (sectionType === Tabs.PROJECTS) {
+        api
+          .getProjects()
+          .then((projects) => projects.map(projectToSelectable))
+          .then(setData)
+          .catch(console.error);
+      }
+    } else {
+      if (!focoused) return;
+      handleOnChange(
+        selectedIdx,
+        converSelectableItemToSelectOption(data[selectedIdx]!),
+      );
     }
-  }, []);
+  }, [focoused]);
+
+  const onChange = (idx: number, option: SelectOption | null) => {
+    setSelectedIdx(idx);
+    handleOnChange(idx, option);
+  };
 
   return (
     <box
@@ -71,7 +93,7 @@ export function SelectableList({
         showDescription={false}
         focusedBackgroundColor={"transparent"}
         onSelect={handleSelect}
-        onChange={handleOnChange}
+        onChange={onChange}
         options={data?.map((item) => converSelectableItemToSelectOption(item))}
         style={{ flexGrow: 1 }}
       />

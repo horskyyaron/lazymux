@@ -16,9 +16,7 @@ function App() {
   const renderer = useRenderer();
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [candidateSelection, setCandidateSelection] =
-    useState<SelectableItem | null>(null);
-  const [candidateMenu, setCandidateMenu] = useState<string>("");
+  const [menu, setMenu] = useState<string>("");
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -55,10 +53,8 @@ function App() {
 
   const handleOnChange = async (index: number, option: SelectOption | null) => {
     if (!option) return;
-    console.log("option:", option);
     const selection = option.value as SelectableItem;
-    setCandidateSelection(selection);
-    setCandidateMenu(generateMenuLineForItem(selection));
+    setMenu(generateMenuLineForItem(selection));
     const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
@@ -114,7 +110,7 @@ function App() {
         </box>
       </box>
       <box flexDirection="row">
-        <text>{candidateMenu}</text>
+        <text>{menu}</text>
       </box>
     </box>
   );
