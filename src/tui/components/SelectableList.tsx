@@ -8,7 +8,9 @@ import {
 } from "../../utils/typeConversions";
 import { useKeyboard } from "@opentui/react";
 import {
+  Action,
   generateKeybindingFromSelectionItem,
+  isDestroyAction,
   type Keybinding,
 } from "../../core/keybinding/keybinding";
 import { actionHandlers } from "../../core/keybinding/actionHandler";
@@ -61,6 +63,7 @@ export function SelectableList({
     apiCall()
       .then((items) => {
         setData(items);
+        if (!items) return;
         handleOnChange(
           selectedIdx,
           converSelectableItemToSelectOption(
@@ -80,12 +83,17 @@ export function SelectableList({
     if (focoused) {
       selectionKeybinding?.map(async (keymap) => {
         if (key.name === keymap.key) {
+          // this means that the list is becoming shorter, if we are on the last item,
+          // we need to dec the selected index by 1
+          if (
+            isDestroyAction(keymap.action) &&
+            data &&
+            selectedIdx === data?.length - 1
+          )
+            setSelectedIdx(selectedIdx - 1);
           await actionHandlers[keymap.action]({
             name: data![selectedIdx]?.name!,
           });
-          if (selectedIdx == data?.length) {
-            setSelectedIdx(selectedIdx - 2);
-          }
           await refetch();
         }
       });
@@ -99,7 +107,9 @@ export function SelectableList({
       if (!focoused) return;
       handleOnChange(
         selectedIdx,
-        converSelectableItemToSelectOption(data[selectedIdx]!),
+        converSelectableItemToSelectOption(
+          data[selectedIdx == data.length ? selectedIdx - 1 : selectedIdx]!,
+        ),
       );
     }
   }, [focoused]);

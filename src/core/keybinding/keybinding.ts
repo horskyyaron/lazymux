@@ -22,6 +22,12 @@ type ProjectAction =
   | Action.FOCUS_ON_README
   | Action.DELETE_PROJECT_FOLDER;
 
+export const isDestroyAction = (action: Action) => {
+  return (
+    action === Action.DELETE_PROJECT_FOLDER || action === Action.KILL_SESSION
+  );
+};
+
 export interface KeyBindingInfo<A extends Action = Action> {
   key: string; // e.g. "enter", "x", "r", "o"
   label: string; // human readable: "Attach", "Kill session", ...
@@ -29,15 +35,15 @@ export interface KeyBindingInfo<A extends Action = Action> {
 }
 
 export type Keybinding<A extends Action = Action> = KeyBindingInfo<A>[];
-type SessionMenu = Keybinding<SessionAction>;
-type ProjectMenu = Keybinding<ProjectAction>;
+type SessionKeybinding = Keybinding<SessionAction>;
+type ProjectKeybinding = Keybinding<ProjectAction>;
 
 export function generateKeybindingFromSelectionItem(
   item: SelectableItem,
 ): Keybinding {
   switch (item.kind) {
     case "session": {
-      const menu: SessionMenu = [
+      const keybinding: SessionKeybinding = [
         {
           key: "<enter>",
           label: "Attach",
@@ -65,11 +71,11 @@ export function generateKeybindingFromSelectionItem(
       //   });
       // }
 
-      return menu;
+      return keybinding;
     }
 
     case "project": {
-      const menu: ProjectMenu = [
+      const keybinding: ProjectKeybinding = [
         {
           key: "<enter>",
           label: "Start session",
@@ -91,7 +97,7 @@ export function generateKeybindingFromSelectionItem(
           action: Action.FOCUS_ON_README,
         },
       ];
-      return menu;
+      return keybinding;
     }
   }
 }
