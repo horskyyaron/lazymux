@@ -10,7 +10,7 @@ import {
   type SelectableItem,
   type Session,
 } from "../data/types";
-import { getMenuForItem, type Menu } from "../core/menu/menuGenerator";
+import { generateMenuLineForItem, type Menu } from "../core/menu/menuGenerator";
 
 function App() {
   const renderer = useRenderer();
@@ -18,7 +18,7 @@ function App() {
   const [readme, setReadme] = useState<string>("");
   const [candidateSelection, setCandidateSelection] =
     useState<SelectableItem | null>(null);
-  const [candidateMenu, setCandidateMenu] = useState<Menu | null>(null);
+  const [candidateMenu, setCandidateMenu] = useState<string>("");
   console.log(candidateMenu);
 
   useKeyboard((key: KeyEvent) => {
@@ -56,7 +56,7 @@ function App() {
     console.log("option:", option);
     const selection = option.value as SelectableItem;
     setCandidateSelection(selection);
-    setCandidateMenu(getMenuForItem(selection));
+    setCandidateMenu(generateMenuLineForItem(selection));
     const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
@@ -111,10 +111,8 @@ function App() {
           </scrollbox>
         </box>
       </box>
-      <box>
-        {candidateMenu?.map((item, idx) => {
-          return <text key={idx}>{item.label}</text>;
-        })}
+      <box flexDirection="row">
+        <text>{candidateMenu}</text>
       </box>
     </box>
   );

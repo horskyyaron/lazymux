@@ -20,7 +20,9 @@ export const converSelectableItemToSelectOption = (
 ): SelectOption => {
   return {
     name:
-      item.kind === "session" && item.isCurrent ? `🟢 ${item.name}` : item.name,
+      item.kind === "session" && item.isCurrent
+        ? `🟢 ${item.name} (attached)`
+        : item.name,
     description: "",
     value: item,
   };
