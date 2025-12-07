@@ -4,12 +4,12 @@
     - [X] menu for session
     - [x] menu for project
 - [ ] keybinding support:
-    - [ ] session:
+    - [x] session:
         - [x] kill
-        - [ ] switch-to
+        - [x] switch-to
     - [ ] project:
+        - [-] create session
         - [ ] delete project (move to archive, make it configurable)
-        - [ ] create readme inplace
 - [ ] fzf search in lists (projects and sessions)
 - [ ] remote github projects (projectProvider):
     - [ ] show 
