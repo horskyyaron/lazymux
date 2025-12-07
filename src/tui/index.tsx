@@ -10,13 +10,17 @@ import {
   type SelectableItem,
   type Session,
 } from "../data/types";
-import { generateMenuLineForItem, type Menu } from "../core/menu/menuGenerator";
+import {
+  generateMenuFromSelectionItem,
+  getMenuDescription,
+  type Menu,
+} from "../core/menu/menuGenerator";
 
 function App() {
   const renderer = useRenderer();
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [menu, setMenu] = useState<string>("");
+  const [menu, setMenu] = useState<Menu | null>(null);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -54,7 +58,7 @@ function App() {
   const handleOnChange = async (index: number, option: SelectOption | null) => {
     if (!option) return;
     const selection = option.value as SelectableItem;
-    setMenu(generateMenuLineForItem(selection));
+    setMenu(generateMenuFromSelectionItem(selection));
     const readme = await api.getProjectReadme(selection);
     setReadme(readme);
   };
@@ -110,7 +114,7 @@ function App() {
         </box>
       </box>
       <box flexDirection="row">
-        <text>{menu}</text>
+        <text>{getMenuDescription(menu)}</text>
       </box>
     </box>
   );

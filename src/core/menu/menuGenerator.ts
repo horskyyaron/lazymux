@@ -32,7 +32,7 @@ export type Menu<A extends Action = Action> = KeyBinding<A>[];
 type SessionMenu = Menu<SessionAction>;
 type ProjectMenu = Menu<ProjectAction>;
 
-function getMenuForItem(item: SelectableItem): Menu {
+export function generateMenuFromSelectionItem(item: SelectableItem): Menu {
   switch (item.kind) {
     case "session": {
       const menu: SessionMenu = [
@@ -94,8 +94,8 @@ function getMenuForItem(item: SelectableItem): Menu {
   }
 }
 
-export function generateMenuLineForItem(item: SelectableItem): string {
-  const menu = getMenuForItem(item);
+export function getMenuDescription(menu: Menu | null): string {
+  if (!menu) return "";
   let menuLine = "";
   menu.map((action, idx) => {
     menuLine =
