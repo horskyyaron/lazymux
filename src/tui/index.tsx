@@ -3,7 +3,13 @@ import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
 import { useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
-import { Tabs, type ListSection, type SelectableItem } from "../data/types";
+import {
+  Tabs,
+  type ListSection,
+  type Project,
+  type SelectableItem,
+  type Session,
+} from "../data/types";
 import {
   Action,
   generateKeybindingForReadme,
@@ -46,19 +52,24 @@ function App() {
     setKeybinding(generateKeybindingForReadme());
   };
 
-  const handleProjectSelect = async (index: number, option: SelectOption) => {
-    actionHandlers[Action.START_PROJECT_SESSION]({ name: option.name });
+  const handleProjectSelect = async (index: number, project: Project) => {
+    actionHandlers[Action.START_PROJECT_SESSION]({
+      name: project.name,
+      path: project.path,
+    });
   };
 
-  const handleSessionSelect = async (index: number, option: SelectOption) => {
-    actionHandlers[Action.SWITCH_SESSION_CLIENT]({ name: option.name });
+  const handleSessionSelect = async (index: number, session: Session) => {
+    actionHandlers[Action.SWITCH_SESSION_CLIENT]({
+      name: session.name,
+    });
   };
 
   const handleSelect = async (index: number, option: SelectOption | null) => {
     if (!option) return;
     selectedTab === Tabs.SESSIONS
-      ? handleSessionSelect(index, option)
-      : handleProjectSelect(index, option);
+      ? handleSessionSelect(index, option.value)
+      : handleProjectSelect(index, option.value);
   };
 
   const handleOnChange = async (index: number, option: SelectOption | null) => {

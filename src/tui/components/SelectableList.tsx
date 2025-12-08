@@ -97,10 +97,13 @@ export function SelectableList({
             data &&
             selectedIdx === data?.length - 1
           )
+            // updating index
             setSelectedIdx(selectedIdx - 1);
+          // executing
           await actionHandlers[keymap.action]({
             name: data![selectedIdx]?.name!,
           });
+          // updating data
           await refetch();
         }
       });
