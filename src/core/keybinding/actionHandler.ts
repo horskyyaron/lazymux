@@ -10,36 +10,80 @@ type ActionHandler = (payload: {
   path?: string;
 }) => Promise<boolean>;
 
-export const actionHandlers: Record<Action, ActionHandler> = {
-  [Action.KILL_SESSION]: async ({ name }) => await killTmuxSession(name),
-  [Action.SWITCH_SESSION_CLIENT]: async ({ name }) =>
-    await switchTmuxSession(name),
-  [Action.START_PROJECT_SESSION]: async ({ name, path }) => {
-    if (!path)
-      throw new Error("must provide a path for starting a new session");
-    return await createTmuxSession(name, path);
+export const keybindHandler: Record<Action, ActionHandler> = {
+  // -----------------------------
+  // SESSION ACTIONS
+  // -----------------------------
+  [Action.SESSION_KILL_SESSION]: async ({ name }) => {
+    return killTmuxSession(name);
   },
-  [Action.OPEN_PROJECT_FOLDER]: async ({ name }) => {
-    console.log("open folder", name);
+
+  [Action.SESSION_SWITCH_SESSION_CLIENT]: async ({ name }) => {
+    return switchTmuxSession(name);
+  },
+
+  [Action.SESSION_RENAME_SESSION]: async ({ name }) => {
+    console.log("SESSION_RENAME_SESSION not implemented. Name:", name);
     return false;
   },
-  [Action.DELETE_PROJECT_FOLDER]: async ({ name }) => {
-    console.log("delete folder", name);
+
+  // -----------------------------
+  // PROJECT ACTIONS
+  // -----------------------------
+  [Action.PROJECT_START_PROJECT_SESSION]: async ({ name, path }) => {
+    if (!path) {
+      console.error("PROJECT_START_PROJECT_SESSION requires a path.");
+      return false;
+    }
+    return createTmuxSession(name, path);
+  },
+
+  [Action.PROJECT_OPEN_PROJECT_FOLDER]: async ({ name, path }) => {
+    console.log("PROJECT_OPEN_PROJECT_FOLDER not implemented.", { name, path });
     return false;
   },
-  [Action.FOCUS_ON_README]: function (payload: {
-    name: string;
-  }): Promise<boolean> {
-    throw new Error("Function not implemented.");
+
+  [Action.PROJECT_DELETE_PROJECT_FOLDER]: async ({ name, path }) => {
+    console.log("PROJECT_DELETE_PROJECT_FOLDER not implemented.", {
+      name,
+      path,
+    });
+    return false;
   },
-  [Action.PREVIOUS_TAB]: function (payload: {
-    name: string;
-  }): Promise<boolean> {
-    throw new Error("Function not implemented.");
+
+  // -----------------------------
+  // README / UI ACTIONS
+  // -----------------------------
+  [Action.README_FOCUS_ON_README]: async () => {
+    console.log("README_FOCUS_ON_README triggered (needs UI handler).");
+    return false;
   },
-  [Action.RENAME_SESSION]: async ({ name }) => {
-    // placeholder
-    console.log("rename session not implemented");
+
+  [Action.UI_PREVIOUS_TAB]: async () => {
+    console.log("UI_PREVIOUS_TAB triggered (needs UI handler).");
+    return false;
+  },
+
+  // -----------------------------
+  // VIM MODE ACTIONS
+  // -----------------------------
+  [Action.VIM_ESC]: async () => {
+    console.log("VIM_ESC triggered.");
+    return false;
+  },
+
+  [Action.VIM_SELECTION_MODE]: async () => {
+    console.log("VIM_SELECTION_MODE triggered.");
+    return false;
+  },
+
+  [Action.VIM_JUMP_TO_BOTTOM]: async () => {
+    console.log("VIM_JUMP_TO_BOTTOM triggered.");
+    return false;
+  },
+
+  [Action.VIM_JUMP_TO_TOP]: async () => {
+    console.log("VIM_JUMP_TO_TOP triggered.");
     return false;
   },
 };

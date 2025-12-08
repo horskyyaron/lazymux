@@ -1,101 +1,72 @@
-import type { SelectableItem } from "../../data/types";
+import { SelectableItemsTypes, type SelectableItem } from "../../data/types";
 
 export enum Action {
-  SWITCH_SESSION_CLIENT = "switch-client",
-  KILL_SESSION = "kill-session",
-  RENAME_SESSION = "rename-session",
-  START_PROJECT_SESSION = "start-project-session",
-  OPEN_PROJECT_FOLDER = "open-project-folder",
-  DELETE_PROJECT_FOLDER = "delete-project-folder",
-  FOCUS_ON_README = "focus-on-readme",
-  PREVIOUS_TAB = "previous-tab",
+  SESSION_SWITCH_SESSION_CLIENT = "switch-client",
+  SESSION_KILL_SESSION = "kill-session",
+  SESSION_RENAME_SESSION = "rename-session",
+  PROJECT_START_PROJECT_SESSION = "start-project-session",
+  PROJECT_OPEN_PROJECT_FOLDER = "open-project-folder",
+  PROJECT_DELETE_PROJECT_FOLDER = "delete-project-folder",
+  README_FOCUS_ON_README = "focus-on-readme",
+  UI_PREVIOUS_TAB = "previous-tab",
+  VIM_ESC = "esc",
+  VIM_SELECTION_MODE = "selection-mode",
+  VIM_JUMP_TO_BOTTOM = "jump-to-bottom",
+  VIM_JUMP_TO_TOP = "jump-to-top",
 }
 
-type SessionAction =
-  | Action.SWITCH_SESSION_CLIENT
-  | Action.KILL_SESSION
-  | Action.FOCUS_ON_README
-  | Action.RENAME_SESSION;
-
-type ProjectAction =
-  | Action.START_PROJECT_SESSION
-  | Action.OPEN_PROJECT_FOLDER
-  | Action.FOCUS_ON_README
-  | Action.DELETE_PROJECT_FOLDER;
-
-export const isDestroyAction = (action: Action) => {
-  return (
-    action === Action.DELETE_PROJECT_FOLDER || action === Action.KILL_SESSION
-  );
-};
-
-export interface KeyBindingInfo<A extends Action = Action> {
+export interface Keybinding {
   key: string; // e.g. "enter", "x", "r", "o"
   label: string; // human readable: "Attach", "Kill session", ...
-  action: A;
+  action: Action;
 }
-
-export type Keybinding<A extends Action = Action> = KeyBindingInfo<A>[];
-type SessionKeybinding = Keybinding<SessionAction>;
-type ProjectKeybinding = Keybinding<ProjectAction>;
 
 export function generateKeybindingFromSelectionItem(
   item: SelectableItem,
-): Keybinding {
+): Keybinding[] {
   switch (item.kind) {
-    case "session": {
-      const keybinding: SessionKeybinding = [
+    case SelectableItemsTypes.SESSION: {
+      const keybinding: Keybinding[] = [
         {
           key: "<enter>",
           label: "Attach",
-          action: Action.SWITCH_SESSION_CLIENT,
+          action: Action.SESSION_SWITCH_SESSION_CLIENT,
         },
         {
           key: "x",
           label: "Kill",
-          action: Action.KILL_SESSION,
+          action: Action.SESSION_KILL_SESSION,
         },
         {
           key: "r",
           label: "Readme",
-          action: Action.FOCUS_ON_README,
+          action: Action.README_FOCUS_ON_README,
         },
       ];
-
-      // // Example: dynamic options based on state
-      // if (item.isCurrent) {
-      //   // maybe add a "mark as current" or something
-      //   menu.push({
-      //     key: "x",
-      //     action: Action.ATTACH_SESSION,
-      //     label: "🟢 current session",
-      //   });
-      // }
-
       return keybinding;
     }
 
-    case "project": {
-      const keybinding: ProjectKeybinding = [
+    case SelectableItemsTypes.PROJECT: {
+      const keybinding: Keybinding[] = [
         {
           key: "<enter>",
           label: "Start session",
-          action: Action.START_PROJECT_SESSION,
+          action: Action.PROJECT_START_PROJECT_SESSION,
         },
         {
           key: "o",
           label: "Open",
-          action: Action.OPEN_PROJECT_FOLDER,
+          action: Action.PROJECT_OPEN_PROJECT_FOLDER,
         },
         {
           key: "d",
           label: "Delete",
-          action: Action.DELETE_PROJECT_FOLDER,
+          action: Action.PROJECT_DELETE_PROJECT_FOLDER,
         },
         {
           key: "r",
           label: "Readme",
-          action: Action.FOCUS_ON_README,
+          action: Action.README_FOCUS_ON_README,
         },
       ];
       return keybinding;
@@ -103,37 +74,37 @@ export function generateKeybindingFromSelectionItem(
   }
 }
 
-export function generateKeybindingForReadme(): Keybinding {
-  const keybinding: Keybinding = [
+export function generateVimBinding(): Keybinding[] {
+  const keybinding: Keybinding[] = [
+    {
+      key: "G",
+      label: "Jump to bottom",
+      action: Action.VIM_JUMP_TO_BOTTOM,
+    },
+  ];
+  return keybinding;
+}
+
+export function generateKeybindingForReadme(): Keybinding[] {
+  const keybinding: Keybinding[] = [
     {
       key: "h",
       label: "Previous Tab",
-      action: Action.PREVIOUS_TAB,
+      action: Action.UI_PREVIOUS_TAB,
     },
   ];
-
-  // // Example: dynamic options based on state
-  // if (item.isCurrent) {
-  //   // maybe add a "mark as current" or something
-  //   menu.push({
-  //     key: "x",
-  //     action: Action.ATTACH_SESSION,
-  //     label: "🟢 current session",
-  //   });
-  // }
-
   return keybinding;
 }
 
 export function getKeybindingDescription(
-  keybinding: Keybinding | null,
+  keybinding: Keybinding[] | null,
 ): string {
   if (!keybinding) return "";
-  let menuLine = "";
+  let description = "";
   keybinding.map((action, idx) => {
-    menuLine =
-      menuLine +
+    description =
+      description +
       `${action.label}: ${action.key}${idx != keybinding.length - 1 ? " | " : ""}`;
   });
-  return menuLine;
+  return description;
 }

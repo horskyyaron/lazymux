@@ -18,7 +18,7 @@ import {
   getKeybindingDescription,
   type Keybinding,
 } from "../core/keybinding/keybinding";
-import { actionHandlers } from "../core/keybinding/actionHandler";
+import { keybindHandler } from "../core/keybinding/actionHandler";
 import {
   projectToSelectable,
   sessionToSelectable,
@@ -30,7 +30,7 @@ function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
-  const [keybinding, setKeybinding] = useState<Keybinding | null>(null);
+  const [keybindings, setKeybindings] = useState<Keybinding[] | null>(null);
   const [previousTab, setPreviousTab] = useState<Tabs>(Tabs.SESSIONS);
   const [currentSelection, setCurrentSelection] =
     useState<SelectableItem | null>(null);
@@ -76,17 +76,16 @@ function App() {
   const handleReadme = async () => {
     setPreviousTab(selectedTab);
     setSelectedTab(Tabs.README);
-    setKeybinding(generateKeybindingForReadme());
+    setKeybindings(generateKeybindingForReadme());
   };
 
   const handleSelect = async (index: number, item: SelectableItem | null) => {
     if (!item) return;
     item.kind === SelectableItemsTypes.SESSION
-      ? // ? handleSessionSelect(index, item.data)
-        await actionHandlers[Action.SWITCH_SESSION_CLIENT]({
+      ? await keybindHandler[Action.SESSION_SWITCH_SESSION_CLIENT]({
           name: item.data.name,
         })
-      : await actionHandlers[Action.START_PROJECT_SESSION]({
+      : await keybindHandler[Action.PROJECT_START_PROJECT_SESSION]({
           name: item.data.name,
           path: item.data.path,
         });
@@ -96,7 +95,7 @@ function App() {
   const handleOnChange = async (index: number, item: SelectableItem | null) => {
     if (!item) return;
     setCurrentSelection(item);
-    setKeybinding(generateKeybindingFromSelectionItem(item));
+    setKeybindings(generateKeybindingFromSelectionItem(item));
     const readme = await api.getProjectReadme(item.data);
     setReadme(readme);
   };
@@ -163,7 +162,7 @@ function App() {
         </box>
       </box>
       <box flexDirection="row">
-        <text>{getKeybindingDescription(keybinding)}</text>
+        <text>{getKeybindingDescription(keybindings)}</text>
       </box>
     </box>
   );

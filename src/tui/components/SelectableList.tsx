@@ -5,9 +5,10 @@ import { useKeyboard } from "@opentui/react";
 import type { KeyEvent } from "@opentui/core";
 import {
   generateKeybindingFromSelectionItem,
+  generateVimBinding,
   type Keybinding,
 } from "../../core/keybinding/keybinding";
-import { actionHandlers } from "../../core/keybinding/actionHandler";
+import { keybindHandler } from "../../core/keybinding/actionHandler";
 
 export interface SelectableListProps {
   sectionType: SectionType;
@@ -31,7 +32,7 @@ export function SelectableList({
   focoused = false,
 }: SelectableListProps) {
   const [selectedIdx, setSelectedIdx] = useState<number>(-1);
-  const [keybinidng, setKeybinding] = useState<Keybinding | null>(null);
+  const [keybinidng, setKeybinding] = useState<Keybinding[] | null>(null);
 
   useKeyboard((key: KeyEvent) => {
     const selection = items[selectedIdx];
@@ -39,9 +40,9 @@ export function SelectableList({
     if (focoused) {
       keybinidng?.map(async (binding) => {
         if (key.name === binding.key) {
-          await actionHandlers[binding.action]({
+          await keybindHandler[binding.action]({
             name: selection.data.name,
-            path: selection.data.path ?? undefined,
+            path: selection.data.path,
           });
           await handleRefetch();
         }
@@ -70,7 +71,10 @@ export function SelectableList({
 
   const onChange = (idx: number, item: SelectableItem) => {
     setSelectedIdx(idx);
-    setKeybinding(generateKeybindingFromSelectionItem(item));
+    setKeybinding([
+      ...generateKeybindingFromSelectionItem(item),
+      ...generateVimBinding(),
+    ]);
     handleOnChange(idx, item);
   };
 
