@@ -1,3 +1,4 @@
+import type { SelectOption } from "@opentui/core";
 import {
   SelectableItemsTypes,
   type Project,
@@ -14,3 +15,16 @@ export const projectToSelectable = (p: Project): SelectableItem => ({
   kind: SelectableItemsTypes.PROJECT,
   data: p,
 });
+
+export const converSelectableItemToSelectOption = (
+  item: SelectableItem,
+): SelectOption => {
+  return {
+    name:
+      item.kind === SelectableItemsTypes.SESSION && item.data.isCurrent
+        ? `🟢 ${item.data.name} (attached)`
+        : item.data.name,
+    description: "",
+    value: item,
+  };
+};

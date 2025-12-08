@@ -1,6 +1,6 @@
 import { createCliRenderer, KeyEvent, type SelectOption } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import {
@@ -75,24 +75,17 @@ function App() {
     setKeybinding(generateKeybindingForReadme());
   };
 
-  const handleProjectSelect = async (index: number, project: Project) => {
-    actionHandlers[Action.START_PROJECT_SESSION]({
-      name: project.name,
-      path: project.path,
-    });
-  };
-
-  const handleSessionSelect = async (index: number, session: Session) => {
-    actionHandlers[Action.SWITCH_SESSION_CLIENT]({
-      name: session.name,
-    });
-  };
-
   const handleSelect = async (index: number, item: SelectableItem | null) => {
     if (!item) return;
     item.kind === SelectableItemsTypes.SESSION
-      ? handleSessionSelect(index, item.data)
-      : handleProjectSelect(index, item.data);
+      ? // ? handleSessionSelect(index, item.data)
+        actionHandlers[Action.SWITCH_SESSION_CLIENT]({
+          name: item.data.name,
+        })
+      : actionHandlers[Action.START_PROJECT_SESSION]({
+          name: item.data.name,
+          path: item.data.path,
+        });
   };
 
   const handleOnChange = async (index: number, item: SelectableItem | null) => {
