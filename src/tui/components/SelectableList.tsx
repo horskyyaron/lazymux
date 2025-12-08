@@ -21,6 +21,7 @@ export interface SelectableListProps {
   handleSelect: (index: number, option: SelectOption | null) => void;
   handleOnChange: (index: number, option: SelectOption | null) => void;
   handleReadme: () => void;
+  data: SelectableItem[];
   focoused: boolean;
 }
 
@@ -43,6 +44,7 @@ export function SelectableList({
   handleSelect,
   handleOnChange,
   handleReadme,
+  data: items,
   focoused = false,
 }: SelectableListProps) {
   const [data, setData] = useState<SelectableItem[]>();

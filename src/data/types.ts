@@ -29,4 +29,5 @@ export type SectionType = Exclude<Tabs, Tabs.README>;
 export type ListSection = {
   sectionTabName: string;
   sectionType: SectionType;
+  data: SelectableItem[];
 };

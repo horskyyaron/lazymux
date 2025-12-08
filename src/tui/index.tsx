@@ -18,6 +18,10 @@ import {
   type Keybinding,
 } from "../core/keybinding/keybinding";
 import { actionHandlers } from "../core/keybinding/actionHandler";
+import {
+  projectToSelectable,
+  sessionToSelectable,
+} from "../utils/typeConversions";
 
 function App() {
   const renderer = useRenderer();
@@ -100,8 +104,16 @@ function App() {
   };
 
   const ListSections: ListSection[] = [
-    { sectionTabName: "sessions", sectionType: Tabs.SESSIONS },
-    { sectionTabName: "projects", sectionType: Tabs.PROJECTS },
+    {
+      sectionTabName: "sessions",
+      sectionType: Tabs.SESSIONS,
+      data: sessions.map((s) => sessionToSelectable(s)),
+    },
+    {
+      sectionTabName: "projects",
+      sectionType: Tabs.PROJECTS,
+      data: projects.map((p) => projectToSelectable(p)),
+    },
   ];
 
   return (
@@ -124,6 +136,7 @@ function App() {
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
                 handleReadme={handleReadme}
+                data={s.data}
               />
             );
           })}
