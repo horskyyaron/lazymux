@@ -60,7 +60,7 @@ export async function createTmuxSession(
 ): Promise<boolean> {
   try {
     // Switch the active client to the target session
-    await run(`tmux switch-client -t ${name}`);
+    await run(`tmux new-session -d -s ${name} -c ${path}`);
     return true;
   } catch (err) {
     console.error("Failed to switch session:", err);
