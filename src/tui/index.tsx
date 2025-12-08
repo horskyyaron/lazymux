@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import {
+  SelectableItemsTypes,
   Tabs,
   type ListSection,
   type Project,
@@ -87,19 +88,18 @@ function App() {
     });
   };
 
-  const handleSelect = async (index: number, option: SelectOption | null) => {
-    if (!option) return;
-    selectedTab === Tabs.SESSIONS
-      ? handleSessionSelect(index, option.value)
-      : handleProjectSelect(index, option.value);
+  const handleSelect = async (index: number, item: SelectableItem | null) => {
+    if (!item) return;
+    item.kind === SelectableItemsTypes.SESSION
+      ? handleSessionSelect(index, item.data)
+      : handleProjectSelect(index, item.data);
   };
 
-  const handleOnChange = async (index: number, option: SelectOption | null) => {
-    if (!option) return;
-    const selection = option.value as SelectableItem;
-    setCurrentSelection(selection);
-    setKeybinding(generateKeybindingFromSelectionItem(selection));
-    const readme = await api.getProjectReadme(selection);
+  const handleOnChange = async (index: number, item: SelectableItem | null) => {
+    if (!item) return;
+    setCurrentSelection(item);
+    setKeybinding(generateKeybindingFromSelectionItem(item));
+    const readme = await api.getProjectReadme(item.data);
     setReadme(readme);
   };
 

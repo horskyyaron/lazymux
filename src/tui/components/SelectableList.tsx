@@ -1,5 +1,10 @@
 import type { KeyEvent, SelectOption, TabSelect } from "@opentui/core";
-import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
+import {
+  SelectableItemsTypes,
+  Tabs,
+  type SectionType,
+  type SelectableItem,
+} from "../../data/types";
 import { useEffect, useState } from "react";
 import { api } from "../../core";
 import {
@@ -18,8 +23,8 @@ import { actionHandlers } from "../../core/keybinding/actionHandler";
 export interface SelectableListProps {
   sectionType: SectionType;
   sectionHeader: string;
-  handleSelect: (index: number, option: SelectOption | null) => void;
-  handleOnChange: (index: number, option: SelectOption | null) => void;
+  handleSelect: (index: number, item: SelectableItem | null) => void;
+  handleOnChange: (index: number, item: SelectableItem | null) => void;
   handleReadme: () => void;
   data: SelectableItem[];
   focoused: boolean;
@@ -30,9 +35,9 @@ export const converSelectableItemToSelectOption = (
 ): SelectOption => {
   return {
     name:
-      item.kind === "session" && item.isCurrent
-        ? `🟢 ${item.name} (attached)`
-        : item.name,
+      item.kind === SelectableItemsTypes.SESSION && item.data.isCurrent
+        ? `🟢 ${item.data.name} (attached)`
+        : item.data.name,
     description: "",
     value: item,
   };
@@ -112,23 +117,19 @@ export function SelectableList({
   //   }
   // });
 
-  // useEffect(() => {
-  //   if (!data) {
-  //     refetch();
-  //   } else {
-  //     if (!focoused) return;
-  //     handleOnChange(
-  //       selectedIdx,
-  //       converSelectableItemToSelectOption(
-  //         data[selectedIdx == data.length ? selectedIdx - 1 : selectedIdx]!,
-  //       ),
-  //     );
-  //   }
-  // }, [focoused]);
+  const onFocous = () => {
+    if (!focoused) return;
+    if (!items[selectedIdx]) return;
+    handleOnChange(selectedIdx, items[selectedIdx]);
+  };
 
-  const onChange = (idx: number, option: SelectOption | null) => {
+  useEffect(() => {
+    onFocous();
+  }, [focoused]);
+
+  const onChange = (idx: number, item: SelectableItem | null) => {
     setSelectedIdx(idx);
-    handleOnChange(idx, option);
+    handleOnChange(idx, item);
   };
 
   return (
@@ -148,8 +149,8 @@ export function SelectableList({
         selectedTextColor={focoused ? "black" : "white"}
         showDescription={false}
         focusedBackgroundColor={"transparent"}
-        onSelect={handleSelect}
-        onChange={onChange}
+        onSelect={(idx, option) => handleSelect(idx, option?.value)}
+        onChange={(idx, option) => onChange(idx, option?.value)}
         options={items.map((item) => converSelectableItemToSelectOption(item))}
         style={{ flexGrow: 1 }}
       />

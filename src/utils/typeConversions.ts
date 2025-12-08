@@ -1,11 +1,16 @@
-import type { Project, SelectableItem, Session } from "../data/types";
+import {
+  SelectableItemsTypes,
+  type Project,
+  type SelectableItem,
+  type Session,
+} from "../data/types";
 
 export const sessionToSelectable = (s: Session): SelectableItem => ({
-  kind: "session",
-  ...s,
+  kind: SelectableItemsTypes.SESSION,
+  data: s,
 });
 
 export const projectToSelectable = (p: Project): SelectableItem => ({
-  kind: "project",
-  ...p,
+  kind: SelectableItemsTypes.PROJECT,
+  data: p,
 });
