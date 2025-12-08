@@ -45,6 +45,10 @@ function App() {
     setProjects(data);
   }, []);
 
+  const refetchAll = useCallback(async () => {
+    await Promise.all([refetchSessions(), refetchProjects()]);
+  }, [refetchSessions, refetchProjects]);
+
   // maybe initial load
   useEffect(() => {
     void refetchSessions();
@@ -129,6 +133,7 @@ function App() {
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
                 handleReadme={handleReadme}
+                handleRefetch={refetchAll}
                 data={s.data}
               />
             );
