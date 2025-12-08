@@ -1,16 +1,10 @@
-import type { KeyEvent, SelectOption, TabSelect } from "@opentui/core";
-import { Tabs, type SectionType, type SelectableItem } from "../../data/types";
+import { type SectionType, type SelectableItem } from "../../data/types";
 import { useEffect, useState } from "react";
-import { api } from "../../core";
-import {
-  projectToSelectable,
-  sessionToSelectable,
-} from "../../utils/typeConversions";
+import { converSelectableItemToSelectOption } from "../../utils/typeConversions";
 import { useKeyboard } from "@opentui/react";
+import type { KeyEvent } from "@opentui/core";
 import {
-  Action,
   generateKeybindingFromSelectionItem,
-  isDestroyAction,
   type Keybinding,
 } from "../../core/keybinding/keybinding";
 import { actionHandlers } from "../../core/keybinding/actionHandler";
@@ -18,24 +12,13 @@ import { actionHandlers } from "../../core/keybinding/actionHandler";
 export interface SelectableListProps {
   sectionType: SectionType;
   sectionHeader: string;
-  handleSelect: (index: number, option: SelectOption | null) => void;
-  handleOnChange: (index: number, option: SelectOption | null) => void;
+  handleSelect: (index: number, item: SelectableItem | null) => void;
+  handleOnChange: (index: number, item: SelectableItem | null) => void;
   handleReadme: () => void;
+  handleRefetch: () => Promise<void>;
+  data: SelectableItem[];
   focoused: boolean;
 }
-
-export const converSelectableItemToSelectOption = (
-  item: SelectableItem,
-): SelectOption => {
-  return {
-    name:
-      item.kind === "session" && item.isCurrent
-        ? `🟢 ${item.name} (attached)`
-        : item.name,
-    description: "",
-    value: item,
-  };
-};
 
 export function SelectableList({
   sectionType,
@@ -43,90 +26,52 @@ export function SelectableList({
   handleSelect,
   handleOnChange,
   handleReadme,
+  handleRefetch,
+  data: items,
   focoused = false,
 }: SelectableListProps) {
-  const [data, setData] = useState<SelectableItem[]>();
-  const [selectedIdx, setSelectedIdx] = useState<number>(0);
-  const [selectionKeybinding, setSelectionKeybinding] =
-    useState<Keybinding | null>(null);
-
-  const refetch = async () => {
-    const apiCall: () => Promise<SelectableItem[]> =
-      sectionType === Tabs.SESSIONS
-        ? () =>
-            api
-              .getSessions()
-              .then((sessions) => sessions.map(sessionToSelectable))
-        : () =>
-            api
-              .getProjects()
-              .then((projects) => projects.map(projectToSelectable));
-
-    apiCall()
-      .then((items) => {
-        setData(items);
-        if (!items) return;
-        handleOnChange(
-          selectedIdx,
-          converSelectableItemToSelectOption(
-            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
-          ),
-        );
-        setSelectionKeybinding(
-          generateKeybindingFromSelectionItem(
-            items[selectedIdx == items.length ? selectedIdx - 1 : selectedIdx]!,
-          ),
-        );
-      })
-      .catch(console.error);
-  };
+  const [selectedIdx, setSelectedIdx] = useState<number>(-1);
+  const [keybinidng, setKeybinding] = useState<Keybinding | null>(null);
 
   useKeyboard((key: KeyEvent) => {
-    if (!data) return;
+    const selection = items[selectedIdx];
+    if (!selection) return;
     if (focoused) {
-      selectionKeybinding?.map(async (keymap) => {
-        if (key.name === keymap.key) {
-          if (keymap.action === Action.FOCUS_ON_README) {
-            handleReadme();
-            return;
-          }
-          // this means that the list is becoming shorter, if we are on the last item,
-          // we need to dec the selected index by 1
-          if (
-            isDestroyAction(keymap.action) &&
-            data &&
-            selectedIdx === data?.length - 1
-          )
-            // updating index
-            setSelectedIdx(selectedIdx - 1);
-          // executing
-          await actionHandlers[keymap.action]({
-            name: data![selectedIdx]?.name!,
+      keybinidng?.map(async (binding) => {
+        if (key.name === binding.key) {
+          actionHandlers[binding.action]({
+            name: selection.data.name,
+            path: selection.data.path ?? undefined,
           });
-          // updating data
-          await refetch();
+          await handleRefetch();
         }
       });
     }
   });
 
+  const onFocous = () => {
+    if (!focoused) return;
+    if (!items[selectedIdx]) return;
+    handleOnChange(selectedIdx, items[selectedIdx]);
+  };
+
+  // HACK: workaround, FIX this when possible. solve such that on data arrival for the firs time, update
   useEffect(() => {
-    if (!data) {
-      refetch();
-    } else {
-      if (!focoused) return;
-      handleOnChange(
-        selectedIdx,
-        converSelectableItemToSelectOption(
-          data[selectedIdx == data.length ? selectedIdx - 1 : selectedIdx]!,
-        ),
-      );
+    if (!focoused) return;
+    if (items && items.length > 0 && items[0] && selectedIdx === -1) {
+      onChange(0, items[0]);
     }
+  }, [focoused, items]);
+
+  useEffect(() => {
+    if (!focoused) return;
+    onFocous();
   }, [focoused]);
 
-  const onChange = (idx: number, option: SelectOption | null) => {
+  const onChange = (idx: number, item: SelectableItem) => {
     setSelectedIdx(idx);
-    handleOnChange(idx, option);
+    setKeybinding(generateKeybindingFromSelectionItem(item));
+    handleOnChange(idx, item);
   };
 
   return (
@@ -146,9 +91,9 @@ export function SelectableList({
         selectedTextColor={focoused ? "black" : "white"}
         showDescription={false}
         focusedBackgroundColor={"transparent"}
-        onSelect={handleSelect}
-        onChange={onChange}
-        options={data?.map((item) => converSelectableItemToSelectOption(item))}
+        onSelect={(idx, option) => handleSelect(idx, option?.value)}
+        onChange={(idx, option) => onChange(idx, option?.value)}
+        options={items.map((item) => converSelectableItemToSelectOption(item))}
         style={{ flexGrow: 1 }}
       />
     </box>

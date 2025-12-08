@@ -13,10 +13,19 @@ export interface Project {
 }
 
 export type SelectableItem =
-  | ({ kind: "session" } & Session)
-  | ({ kind: "project" } & Project);
+  | {
+      kind: SelectableItemsTypes.SESSION;
+      data: Session;
+    }
+  | {
+      kind: SelectableItemsTypes.PROJECT;
+      data: Project;
+    };
 
-export type SelectableItemType = "session" | "project";
+export enum SelectableItemsTypes {
+  SESSION = "session",
+  PROJECT = "project",
+}
 
 export enum Tabs {
   SESSIONS = "sessions",
@@ -29,4 +38,5 @@ export type SectionType = Exclude<Tabs, Tabs.README>;
 export type ListSection = {
   sectionTabName: string;
   sectionType: SectionType;
+  data: SelectableItem[];
 };

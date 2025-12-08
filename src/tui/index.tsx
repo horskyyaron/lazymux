@@ -1,9 +1,10 @@
 import { createCliRenderer, KeyEvent, type SelectOption } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import {
+  SelectableItemsTypes,
   Tabs,
   type ListSection,
   type Project,
@@ -18,15 +19,41 @@ import {
   type Keybinding,
 } from "../core/keybinding/keybinding";
 import { actionHandlers } from "../core/keybinding/actionHandler";
+import {
+  projectToSelectable,
+  sessionToSelectable,
+} from "../utils/typeConversions";
 
 function App() {
   const renderer = useRenderer();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [keybinding, setKeybinding] = useState<Keybinding | null>(null);
   const [previousTab, setPreviousTab] = useState<Tabs>(Tabs.SESSIONS);
   const [currentSelection, setCurrentSelection] =
     useState<SelectableItem | null>(null);
+
+  const refetchSessions = useCallback(async () => {
+    const data = await api.getSessions();
+    setSessions(data);
+  }, []);
+
+  const refetchProjects = useCallback(async () => {
+    const data = await api.getProjects();
+    setProjects(data);
+  }, []);
+
+  const refetchAll = useCallback(async () => {
+    await Promise.all([refetchSessions(), refetchProjects()]);
+  }, [refetchSessions, refetchProjects]);
+
+  // maybe initial load
+  useEffect(() => {
+    void refetchSessions();
+    void refetchProjects();
+  }, [refetchSessions, refetchProjects]);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
@@ -52,38 +79,39 @@ function App() {
     setKeybinding(generateKeybindingForReadme());
   };
 
-  const handleProjectSelect = async (index: number, project: Project) => {
-    actionHandlers[Action.START_PROJECT_SESSION]({
-      name: project.name,
-      path: project.path,
-    });
+  const handleSelect = async (index: number, item: SelectableItem | null) => {
+    if (!item) return;
+    item.kind === SelectableItemsTypes.SESSION
+      ? // ? handleSessionSelect(index, item.data)
+        actionHandlers[Action.SWITCH_SESSION_CLIENT]({
+          name: item.data.name,
+        })
+      : actionHandlers[Action.START_PROJECT_SESSION]({
+          name: item.data.name,
+          path: item.data.path,
+        });
+    refetchAll();
   };
 
-  const handleSessionSelect = async (index: number, session: Session) => {
-    actionHandlers[Action.SWITCH_SESSION_CLIENT]({
-      name: session.name,
-    });
-  };
-
-  const handleSelect = async (index: number, option: SelectOption | null) => {
-    if (!option) return;
-    selectedTab === Tabs.SESSIONS
-      ? handleSessionSelect(index, option.value)
-      : handleProjectSelect(index, option.value);
-  };
-
-  const handleOnChange = async (index: number, option: SelectOption | null) => {
-    if (!option) return;
-    const selection = option.value as SelectableItem;
-    setCurrentSelection(selection);
-    setKeybinding(generateKeybindingFromSelectionItem(selection));
-    const readme = await api.getProjectReadme(selection);
+  const handleOnChange = async (index: number, item: SelectableItem | null) => {
+    if (!item) return;
+    setCurrentSelection(item);
+    setKeybinding(generateKeybindingFromSelectionItem(item));
+    const readme = await api.getProjectReadme(item.data);
     setReadme(readme);
   };
 
   const ListSections: ListSection[] = [
-    { sectionTabName: "sessions", sectionType: Tabs.SESSIONS },
-    { sectionTabName: "projects", sectionType: Tabs.PROJECTS },
+    {
+      sectionTabName: "sessions",
+      sectionType: Tabs.SESSIONS,
+      data: sessions.map((s) => sessionToSelectable(s)),
+    },
+    {
+      sectionTabName: "projects",
+      sectionType: Tabs.PROJECTS,
+      data: projects.map((p) => projectToSelectable(p)),
+    },
   ];
 
   return (
@@ -106,6 +134,8 @@ function App() {
                 handleSelect={handleSelect}
                 handleOnChange={handleOnChange}
                 handleReadme={handleReadme}
+                handleRefetch={refetchAll}
+                data={s.data}
               />
             );
           })}

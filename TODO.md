@@ -4,11 +4,16 @@
     - [X] menu for session
     - [x] menu for project
 - [ ] keybinding support:
+    - [ ] general:
+        - [ ] gg to go up
+        - [ ] G to go down
     - [x] session:
         - [x] kill
         - [x] switch-to
     - [ ] project:
-        - [-] create session
+        - [x] create session
+        - [ ] create & attach session 
+        - [ ] add create session 
         - [ ] delete project (move to archive, make it configurable)
 - [ ] fzf search in lists (projects and sessions)
 - [ ] remote github projects (projectProvider):
