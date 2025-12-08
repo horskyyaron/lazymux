@@ -39,7 +39,7 @@ export function SelectableList({
     if (focoused) {
       keybinidng?.map(async (binding) => {
         if (key.name === binding.key) {
-          actionHandlers[binding.action]({
+          await actionHandlers[binding.action]({
             name: selection.data.name,
             path: selection.data.path ?? undefined,
           });

@@ -83,14 +83,14 @@ function App() {
     if (!item) return;
     item.kind === SelectableItemsTypes.SESSION
       ? // ? handleSessionSelect(index, item.data)
-        actionHandlers[Action.SWITCH_SESSION_CLIENT]({
+        await actionHandlers[Action.SWITCH_SESSION_CLIENT]({
           name: item.data.name,
         })
-      : actionHandlers[Action.START_PROJECT_SESSION]({
+      : await actionHandlers[Action.START_PROJECT_SESSION]({
           name: item.data.name,
           path: item.data.path,
         });
-    refetchAll();
+    await refetchAll();
   };
 
   const handleOnChange = async (index: number, item: SelectableItem | null) => {

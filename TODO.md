@@ -20,3 +20,4 @@
     - [ ] show 
     - [ ] select: clone into selected folder (projects/) and start tmux session.
 - [ ] readme tab highlight parser
+- [ ] when closing sessions fast, it causes problem, add a queue to handle all of the calls
