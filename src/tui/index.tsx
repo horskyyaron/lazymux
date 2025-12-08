@@ -90,6 +90,7 @@ function App() {
           name: item.data.name,
           path: item.data.path,
         });
+    refetchAll();
   };
 
   const handleOnChange = async (index: number, item: SelectableItem | null) => {
