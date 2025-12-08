@@ -1,6 +1,6 @@
 import { createCliRenderer, KeyEvent, type SelectOption } from "@opentui/core";
 import { createRoot, useKeyboard, useRenderer } from "@opentui/react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SelectableList } from "./components/SelectableList";
 import { api } from "../core";
 import {
@@ -21,12 +21,30 @@ import { actionHandlers } from "../core/keybinding/actionHandler";
 
 function App() {
   const renderer = useRenderer();
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [selectedTab, setSelectedTab] = useState<Tabs>(Tabs.SESSIONS);
   const [readme, setReadme] = useState<string>("");
   const [keybinding, setKeybinding] = useState<Keybinding | null>(null);
   const [previousTab, setPreviousTab] = useState<Tabs>(Tabs.SESSIONS);
   const [currentSelection, setCurrentSelection] =
     useState<SelectableItem | null>(null);
+
+  const refetchSessions = useCallback(async () => {
+    const data = await api.getSessions();
+    setSessions(data);
+  }, []);
+
+  const refetchProjects = useCallback(async () => {
+    const data = await api.getProjects();
+    setProjects(data);
+  }, []);
+
+  // maybe initial load
+  useEffect(() => {
+    void refetchSessions();
+    void refetchProjects();
+  }, [refetchSessions, refetchProjects]);
 
   useKeyboard((key: KeyEvent) => {
     if (key.ctrl && key.name == "t") {
