@@ -1,11 +1,8 @@
 # TODO
-
-- [ ] generate correct menu based on the candidate (session or project)
-    - [X] menu for session
-    - [x] menu for project
 - [ ] keybinding support:
-    - [ ] general:
-        - [ ] gg to go up
+    - [x] generate keybinding string for bottom panel
+    - [ ] navigation:
+        - [ ] gg to go up -> that means a smarter system of keymaps. 
         - [ ] G to go down
     - [x] session:
         - [x] kill
@@ -13,14 +10,21 @@
     - [ ] project:
         - [x] create session
         - [ ] create & attach session 
-        - [ ] add create session 
+        - [x] add create session 
         - [ ] delete project (move to archive, make it configurable)
+        - [ ] open remote repo in a tab in browser
+- [x] generate correct keybindings based on the candidate (session or project)
+    - [X] keybinding for session
+    - [x] keybinding for project
 - [ ] fzf search in lists (projects and sessions)
+- [ ] keymap queue to prevent double action - (press -> queue -> vliadate)
+- [ ] readme tab highlight parser
+- [ ] sync between projects and sessions lists vs popup a message if a project is already runing in a session
 - [ ] remote github projects (projectProvider):
     - [ ] show 
     - [ ] select: clone into selected folder (projects/) and start tmux session.
-- [ ] readme tab highlight parser
+    - [ ] add user's repos
+    - [ ] different tab inside of projects realestate
 - [ ] when closing sessions fast, it causes problem, add a queue to handle all of the calls
 - [ ] convert `PROJECTS` directory into an array of directories
-- [ ] keymap queue to prevent double action - (press -> queue -> vliadate)
 - [ ] configurable mapping (defaults and user's)
