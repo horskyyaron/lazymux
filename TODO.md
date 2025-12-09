@@ -22,3 +22,5 @@
 - [ ] readme tab highlight parser
 - [ ] when closing sessions fast, it causes problem, add a queue to handle all of the calls
 - [ ] convert `PROJECTS` directory into an array of directories
+- [ ] keymap queue to prevent double action - (press -> queue -> vliadate)
+- [ ] configurable mapping (defaults and user's)
