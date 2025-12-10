@@ -16,10 +16,10 @@
 - [x] generate correct keybindings based on the candidate (session or project)
     - [X] keybinding for session
     - [x] keybinding for project
+- [ ] sync between projects and sessions lists vs popup a message if a project is already runing in a session
 - [ ] fzf search in lists (projects and sessions)
 - [ ] keymap queue to prevent double action - (press -> queue -> vliadate)
 - [ ] readme tab highlight parser
-- [ ] sync between projects and sessions lists vs popup a message if a project is already runing in a session
 - [ ] remote github projects (projectProvider):
     - [ ] show 
     - [ ] select: clone into selected folder (projects/) and start tmux session.
